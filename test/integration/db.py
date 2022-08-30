@@ -27,7 +27,7 @@ class TestDataBase(unittest.TestCase):
         self.assertEqual(repo.get_bot_settings(), BotSettings("", {}))
 
         settings = BotSettings(token="test_token", commands={
-            "test_command": [(1, AnswerSettings("message_template", False))]
+            "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
         })
 
         repo.set_bot_settings(settings)

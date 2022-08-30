@@ -21,3 +21,7 @@ class IWapi(metaclass=ABCMeta):
     @abstractmethod
     def start_listen(self, token: str):
         pass
+
+    @abstractmethod
+    def stop_listen(self, token: str):
+        pass

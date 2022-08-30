@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 from model.settings.answer_settings import AnswerSettings
 
@@ -7,4 +7,4 @@ from model.settings.answer_settings import AnswerSettings
 @dataclass
 class BotSettings:
     token: str
-    commands: Dict[str, List[Tuple[int, AnswerSettings]]]
+    commands: Dict[str, Dict[str, AnswerSettings]]

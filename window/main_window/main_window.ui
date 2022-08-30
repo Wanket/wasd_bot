@@ -40,7 +40,7 @@
           <item>
            <widget class="QPushButton" name="start_push_button">
             <property name="text">
-             <string>Запуск</string>
+             <string>Сохранить и запустить</string>
             </property>
            </widget>
           </item>
@@ -67,7 +67,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="commands_list_widget"/>
+             <widget class="QListWidget" name="commands_list_widget">
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -136,7 +140,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="answers_list_widget"/>
+             <widget class="QListWidget" name="answers_list_widget">
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -269,7 +277,7 @@
                  </sizepolicy>
                 </property>
                 <property name="standardButtons">
-                 <set>QDialogButtonBox::Apply|QDialogButtonBox::Reset</set>
+                 <set>QDialogButtonBox::Reset|QDialogButtonBox::Save</set>
                 </property>
                </widget>
               </item>
@@ -285,11 +293,31 @@
        <attribute name="title">
         <string>Помощь</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Где взять токен?&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Перейти по &lt;a href=&quot;https://wasd.tv/general-settings/API&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;ссылке&lt;/span&gt;&lt;/a&gt;, нажать &amp;quot;Сгененировать новый токен&amp;quot;, затем кнопку копирования токена.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Какие плейсхолдены поддеживаются в сообщениях?&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; color:#008080;&quot;&gt;$uptime&lt;/span&gt; — суммарное врем стрима;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#008000;&quot;&gt;$game_name&lt;/span&gt; — имя текущей игры;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#000080;&quot;&gt;$user_name&lt;/span&gt; — имя написавшего команду бота.&lt;/p&gt;&lt;p&gt;Пример: можно создать команду &amp;quot;!время&amp;quot; с сообщением &amp;quot;Стрим идет &lt;span style=&quot; color:#008080;&quot;&gt;$uptime&lt;/span&gt;&amp;quot;. Бот по этому шаблону напишет в чат &amp;quot;Стрим идет 5 минут 26 секунд&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="logs_tab">
        <attribute name="title">
         <string>Логи</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QTextEdit" name="log_text_edit"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

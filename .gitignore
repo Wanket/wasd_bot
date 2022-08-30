@@ -3,6 +3,10 @@
 
 # Project settings
 *.db
+*.db-journal
+
+# Qt creator files
+*.autosave
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

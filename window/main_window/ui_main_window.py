@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QDialog
     QHBoxLayout, QLabel, QLineEdit, QListWidget,
     QListWidgetItem, QMainWindow, QPlainTextEdit, QPushButton,
     QSizePolicy, QSpacerItem, QSpinBox, QSplitter,
-    QTabWidget, QVBoxLayout, QWidget)
+    QTabWidget, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -72,6 +72,7 @@ class Ui_MainWindow(object):
 
         self.commands_list_widget = QListWidget(self.layoutWidget)
         self.commands_list_widget.setObjectName(u"commands_list_widget")
+        self.commands_list_widget.setSortingEnabled(True)
 
         self.verticalLayout_2.addWidget(self.commands_list_widget)
 
@@ -116,6 +117,7 @@ class Ui_MainWindow(object):
 
         self.answers_list_widget = QListWidget(self.layoutWidget1)
         self.answers_list_widget.setObjectName(u"answers_list_widget")
+        self.answers_list_widget.setSortingEnabled(True)
 
         self.verticalLayout_5.addWidget(self.answers_list_widget)
 
@@ -195,7 +197,7 @@ class Ui_MainWindow(object):
         self.apply_button_box.setObjectName(u"apply_button_box")
         sizePolicy1.setHeightForWidth(self.apply_button_box.sizePolicy().hasHeightForWidth())
         self.apply_button_box.setSizePolicy(sizePolicy1)
-        self.apply_button_box.setStandardButtons(QDialogButtonBox.Apply|QDialogButtonBox.Reset)
+        self.apply_button_box.setStandardButtons(QDialogButtonBox.Reset|QDialogButtonBox.Save)
 
         self.horizontalLayout_2.addWidget(self.apply_button_box)
 
@@ -209,9 +211,25 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.start_tab, "")
         self.help_tab = QWidget()
         self.help_tab.setObjectName(u"help_tab")
+        self.verticalLayout_7 = QVBoxLayout(self.help_tab)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.label_5 = QLabel(self.help_tab)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
+        self.label_5.setWordWrap(True)
+
+        self.verticalLayout_7.addWidget(self.label_5)
+
         self.tabWidget.addTab(self.help_tab, "")
         self.logs_tab = QWidget()
         self.logs_tab.setObjectName(u"logs_tab")
+        self.verticalLayout_3 = QVBoxLayout(self.logs_tab)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.log_text_edit = QTextEdit(self.logs_tab)
+        self.log_text_edit.setObjectName(u"log_text_edit")
+
+        self.verticalLayout_3.addWidget(self.log_text_edit)
+
         self.tabWidget.addTab(self.logs_tab, "")
 
         self.verticalLayout.addWidget(self.tabWidget)
@@ -229,7 +247,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"wasd.tv bot", None))
         self.token_line_edit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u0422\u043e\u043a\u0435\u043d wasd.tv", None))
-        self.start_push_button.setText(QCoreApplication.translate("MainWindow", u"\u0417\u0430\u043f\u0443\u0441\u043a", None))
+        self.start_push_button.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0438 \u0437\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u043c\u0430\u043d\u0434\u0430", None))
         self.add_command_button.setText(QCoreApplication.translate("MainWindow", u"+", None))
         self.remove_command_button.setText(QCoreApplication.translate("MainWindow", u"-", None))
@@ -240,6 +258,9 @@ class Ui_MainWindow(object):
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u0412\u0435\u0440\u043e\u044f\u0442\u043d\u043e\u0441\u0442\u043d\u043e\u0435 \u0441\u043e\u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u0435", None))
         self.ban_check_box.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0432 \u0431\u0430\u043d", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.start_tab), QCoreApplication.translate("MainWindow", u"\u0411\u043e\u0442", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:12pt;\">\u0413\u0434\u0435 \u0432\u0437\u044f\u0442\u044c \u0442\u043e\u043a\u0435\u043d?</span></p><p>\u041f\u0435\u0440\u0435\u0439\u0442\u0438 \u043f\u043e <a href=\"https://wasd.tv/general-settings/API\"><span style=\" text-decoration: underline; color:#007af4;\">\u0441\u0441\u044b\u043b\u043a\u0435</span></a>, \u043d\u0430\u0436\u0430\u0442\u044c &quot;\u0421\u0433\u0435\u043d\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439 \u0442\u043e\u043a\u0435\u043d&quot;, \u0437\u0430\u0442\u0435\u043c \u043a\u043d\u043e\u043f\u043a\u0443 \u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f \u0442\u043e\u043a\u0435\u043d\u0430.</p><p><span style=\" font-size:12pt;\">\u041a\u0430\u043a\u0438\u0435 \u043f\u043b\u0435\u0439\u0441\u0445\u043e\u043b\u0434\u0435\u043d\u044b \u043f\u043e\u0434\u0434\u0435\u0436\u0438\u0432\u0430\u044e\u0442\u0441\u044f \u0432 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f\u0445?</span>"
+                        "<br/><span style=\" color:#008080;\">$uptime</span> \u2014 \u0441\u0443\u043c\u043c\u0430\u0440\u043d\u043e\u0435 \u0432\u0440\u0435\u043c \u0441\u0442\u0440\u0438\u043c\u0430;</p><p><span style=\" color:#008000;\">$game_name</span> \u2014 \u0438\u043c\u044f \u0442\u0435\u043a\u0443\u0449\u0435\u0439 \u0438\u0433\u0440\u044b;</p><p><span style=\" color:#000080;\">$user_name</span> \u2014 \u0438\u043c\u044f \u043d\u0430\u043f\u0438\u0441\u0430\u0432\u0448\u0435\u0433\u043e \u043a\u043e\u043c\u0430\u043d\u0434\u0443 \u0431\u043e\u0442\u0430.</p><p>\u041f\u0440\u0438\u043c\u0435\u0440: \u043c\u043e\u0436\u043d\u043e \u0441\u043e\u0437\u0434\u0430\u0442\u044c \u043a\u043e\u043c\u0430\u043d\u0434\u0443 &quot;!\u0432\u0440\u0435\u043c\u044f&quot; \u0441 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435\u043c &quot;\u0421\u0442\u0440\u0438\u043c \u0438\u0434\u0435\u0442 <span style=\" color:#008080;\">$uptime</span>&quot;. \u0411\u043e\u0442 \u043f\u043e \u044d\u0442\u043e\u043c\u0443 \u0448\u0430\u0431\u043b\u043e"
+                        "\u043d\u0443 \u043d\u0430\u043f\u0438\u0448\u0435\u0442 \u0432 \u0447\u0430\u0442 &quot;\u0421\u0442\u0440\u0438\u043c \u0438\u0434\u0435\u0442 5 \u043c\u0438\u043d\u0443\u0442 26 \u0441\u0435\u043a\u0443\u043d\u0434&quot;.</p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.help_tab), QCoreApplication.translate("MainWindow", u"\u041f\u043e\u043c\u043e\u0449\u044c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.logs_tab), QCoreApplication.translate("MainWindow", u"\u041b\u043e\u0433\u0438", None))
     # retranslateUi

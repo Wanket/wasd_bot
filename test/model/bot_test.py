@@ -34,7 +34,7 @@ class TestBot(TestCase):
         bot = Bot()
 
         settings = BotSettings(token="test_token", commands={
-            "test_command": [(1, AnswerSettings("message_template", False))]
+            "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
         })
 
         bot.set_settings(settings)
@@ -43,7 +43,7 @@ class TestBot(TestCase):
 
     def test_get_settings(self):
         settings = BotSettings(token="test_token", commands={
-            "test_command": [(1, AnswerSettings("message_template", False))]
+            "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
         })
 
         self.repository_mock.get_bot_settings.return_value = settings
@@ -56,7 +56,7 @@ class TestBot(TestCase):
 
     def test_on_message(self):
         settings = BotSettings(token="test_token", commands={
-            "test_command": [(1, AnswerSettings("message_template", False))]
+            "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
         })
 
         self.wapi_mock.get_stream_time.return_value = 12345
