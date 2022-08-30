@@ -2,3 +2,4 @@ inject
 unqlite
 jsonpickle
 appdirs
+pyside6

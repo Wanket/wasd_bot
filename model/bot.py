@@ -21,7 +21,7 @@ class Bot:
         try:
             self._reload_settings(self._repository.get_bot_settings())
         except Exception as e:
-            self._logger.error(f"Bot: error while loading bot settings, error text: {e}, loading defaults")
+            self._logger.error(f"{self.__class__.__name__}: error while loading bot settings, error text: {e}, loading defaults")
 
             self._reload_settings(BotSettings("", {}))
 
@@ -42,7 +42,7 @@ class Bot:
         try:
             self._repository.set_bot_settings(bot_settings)
         except Exception as e:
-            self._logger.error(f"Bot: error while saving bot settings, error text: {e}")
+            self._logger.error(f"{self.__class__.__name__}: error while saving bot settings, error text: {e}")
 
             return
 
@@ -57,4 +57,4 @@ class Bot:
 
         self._commands = commands
 
-        self._logger.info("Bot: bot settings loaded/updated")
+        self._logger.info(f"{self.__class__.__name__}: bot settings loaded/updated")

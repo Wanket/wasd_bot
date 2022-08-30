@@ -28,5 +28,9 @@ class ILogger(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def set_level(self, level: int):
+        pass
+
+    @abstractmethod
     def register_logging_handler(self, handler: Callable[[str], None]):
         pass

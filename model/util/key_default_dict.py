@@ -6,6 +6,7 @@ class KeyDefaultDict(defaultdict):
         if self.default_factory is None:
             raise KeyError(key)
         else:
+            # noinspection PyArgumentList
             ret = self[key] = self.default_factory(key)
 
             return ret

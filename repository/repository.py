@@ -3,6 +3,7 @@ import jsonpickle
 from unqlite import UnQLite
 
 from model.settings.bot_settings import BotSettings
+# noinspection PyUnresolvedReferences
 from repository.irepository import IRepository
 from util.iapp_folders import IAppFolders
 

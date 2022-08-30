@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>wasd.tv bot</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -22,25 +22,25 @@
       </property>
       <widget class="QWidget" name="start_tab">
        <attribute name="title">
-        <string>Start</string>
+        <string>Бот</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QLineEdit" name="lineEdit">
+           <widget class="QLineEdit" name="token_line_edit">
             <property name="echoMode">
              <enum>QLineEdit::Password</enum>
             </property>
             <property name="placeholderText">
-             <string>Token</string>
+             <string>Токен wasd.tv</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="start_push_button">
             <property name="text">
-             <string>Start</string>
+             <string>Запуск</string>
             </property>
            </widget>
           </item>
@@ -67,29 +67,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="listWidget">
-              <item>
-               <property name="text">
-                <string>кусь</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>время</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-             </widget>
+             <widget class="QListWidget" name="commands_list_widget"/>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="add_command_button">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -108,7 +91,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_3">
+               <widget class="QPushButton" name="remove_command_button">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -143,7 +126,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
              <widget class="QLabel" name="label_2">
@@ -153,37 +136,12 @@
              </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="listWidget_2">
-              <item>
-               <property name="text">
-                <string>Бан</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Не бан 1</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Не бан 2</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-             </widget>
+             <widget class="QListWidget" name="answers_list_widget"/>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
-               <widget class="QPushButton" name="pushButton_6">
+               <widget class="QPushButton" name="add_answer_button">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -202,7 +160,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_7">
+               <widget class="QPushButton" name="remove_answer_button">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -247,7 +205,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="plainTextEdit"/>
+             <widget class="QPlainTextEdit" name="answer_text_edit"/>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -272,7 +230,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox">
+               <widget class="QSpinBox" name="rate_spin_box">
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -281,7 +239,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox">
+             <widget class="QCheckBox" name="ban_check_box">
               <property name="text">
                <string>Отправить в бан</string>
               </property>
@@ -303,7 +261,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QDialogButtonBox" name="buttonBox">
+               <widget class="QDialogButtonBox" name="apply_button_box">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -325,7 +283,12 @@
       </widget>
       <widget class="QWidget" name="help_tab">
        <attribute name="title">
-        <string>Help</string>
+        <string>Помощь</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="logs_tab">
+       <attribute name="title">
+        <string>Логи</string>
        </attribute>
       </widget>
      </widget>
