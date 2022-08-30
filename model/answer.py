@@ -1,4 +1,3 @@
-from collections import defaultdict
 from string import Template
 from typing import Optional
 

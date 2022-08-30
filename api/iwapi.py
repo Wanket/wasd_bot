@@ -1,15 +1,23 @@
-class IWapi:
+from abc import abstractmethod, ABCMeta
+
+
+class IWapi(metaclass=ABCMeta):
+    @abstractmethod
     def send_message(self, text: str):
-        raise NotImplemented
+        pass
 
+    @abstractmethod
     def ban_user(self, user_id: int):
-        raise NotImplemented
+        pass
 
+    @abstractmethod
     def get_stream_time(self) -> int:
-        raise NotImplemented
+        pass
 
+    @abstractmethod
     def get_game_name(self) -> str:
-        raise NotImplemented
+        pass
 
+    @abstractmethod
     def start_listen(self, token: str):
-        raise NotImplemented
+        pass

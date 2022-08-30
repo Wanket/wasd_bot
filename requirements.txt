@@ -1,1 +1,4 @@
 inject
+unqlite
+jsonpickle
+appdirs

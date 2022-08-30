@@ -1,9 +1,13 @@
+from abc import abstractmethod, ABCMeta
+
 from model.settings.bot_settings import BotSettings
 
 
-class IRepository:
+class IRepository(metaclass=ABCMeta):
+    @abstractmethod
     def get_bot_settings(self) -> BotSettings:
-        raise NotImplemented
+        pass
 
+    @abstractmethod
     def set_bot_settings(self, bot_settings: BotSettings):
-        raise NotImplemented
+        pass

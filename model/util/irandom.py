@@ -1,3 +1,7 @@
-class IRandom:
+from abc import abstractmethod, ABCMeta
+
+
+class IRandom(metaclass=ABCMeta):
+    @abstractmethod
     def randint(self, a, b) -> int:
-        raise NotImplemented
+        pass
