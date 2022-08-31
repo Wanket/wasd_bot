@@ -18,7 +18,7 @@ class Repository(IRepository):
 
     def get_bot_settings(self) -> BotSettings:
         if self._bot_settings_key not in self._db:
-            return BotSettings("", {})
+            return BotSettings("", "", {})
 
         return jsonpickle.loads(self._db[self._bot_settings_key])
 

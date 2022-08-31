@@ -44,6 +44,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.token_line_edit)
 
+        self.channel_line_edit = QLineEdit(self.start_tab)
+        self.channel_line_edit.setObjectName(u"channel_line_edit")
+        self.channel_line_edit.setMaximumSize(QSize(130, 16777215))
+
+        self.horizontalLayout.addWidget(self.channel_line_edit)
+
         self.start_push_button = QPushButton(self.start_tab)
         self.start_push_button.setObjectName(u"start_push_button")
 
@@ -247,6 +253,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"wasd.tv bot", None))
         self.token_line_edit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u0422\u043e\u043a\u0435\u043d wasd.tv", None))
+        self.channel_line_edit.setInputMask("")
+        self.channel_line_edit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u0418\u043c\u044f \u043a\u0430\u043d\u0430\u043b\u0430", None))
         self.start_push_button.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0438 \u0437\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u041a\u043e\u043c\u0430\u043d\u0434\u0430", None))
         self.add_command_button.setText(QCoreApplication.translate("MainWindow", u"+", None))

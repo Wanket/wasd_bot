@@ -24,11 +24,11 @@ class TestDataBase(unittest.TestCase):
 
         repo = Repository()
 
-        self.assertEqual(repo.get_bot_settings(), BotSettings("", {}))
+        self.assertEqual(repo.get_bot_settings(), BotSettings("", "", {}))
 
         settings = BotSettings(token="test_token", commands={
             "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
-        })
+        }, channel="test_channel")
 
         repo.set_bot_settings(settings)
 

@@ -29,13 +29,13 @@ class TestBot(TestCase):
         )
 
     def test_set_settings(self):
-        self.repository_mock.get_bot_settings.return_value = BotSettings(token="", commands={})
+        self.repository_mock.get_bot_settings.return_value = BotSettings(channel="", token="", commands={})
 
         bot = Bot()
 
         settings = BotSettings(token="test_token", commands={
             "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
-        })
+        }, channel="test_channel")
 
         bot.set_settings(settings)
 
@@ -44,7 +44,7 @@ class TestBot(TestCase):
     def test_get_settings(self):
         settings = BotSettings(token="test_token", commands={
             "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
-        })
+        }, channel="test_channel")
 
         self.repository_mock.get_bot_settings.return_value = settings
 
@@ -57,7 +57,7 @@ class TestBot(TestCase):
     def test_on_message(self):
         settings = BotSettings(token="test_token", commands={
             "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
-        })
+        }, channel="test_channel")
 
         self.wapi_mock.get_stream_time.return_value = 12345
 
@@ -78,7 +78,7 @@ class TestBot(TestCase):
 
         settings = bot.get_settings()
 
-        self.assertEqual(settings, BotSettings("", {}))
+        self.assertEqual(settings, BotSettings("", "", {}))
 
         self.logger_mock.error.assert_called_with("Bot: error while loading bot settings, error text: test_exception, loading defaults")
 

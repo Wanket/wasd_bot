@@ -1,9 +1,11 @@
 from PySide6.QtCore import QRegularExpression, Qt
-from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat
+from PySide6.QtGui import QTextCharFormat, QTextDocument
+
+from window.highlight.base_highlighter import BaseHighlighter
 
 
-class MessageHighlighter(QSyntaxHighlighter):
-    def __init__(self, parent: QSyntaxHighlighter):
+class MessageHighlighter(BaseHighlighter):
+    def __init__(self, parent: QTextDocument):
         super().__init__(parent)
 
         uptime_format = QTextCharFormat()
@@ -15,17 +17,8 @@ class MessageHighlighter(QSyntaxHighlighter):
         user_name_format = QTextCharFormat()
         user_name_format.setForeground(Qt.darkBlue)
 
-        self._formats = [
+        self._set_formats([
             (QRegularExpression(r'(\W|^)\$uptime(\W|$)'), uptime_format),
             (QRegularExpression(r'(\W|^)\$game_name(\W|$)'), game_name_format),
             (QRegularExpression(r'(\W|^)\$user_name(\W|$)'), user_name_format),
-        ]
-
-    def highlightBlock(self, text):
-        for pattern, char_format in self._formats:
-            match_it = pattern.globalMatch(text)
-
-            while match_it.hasNext():
-                match = match_it.next()
-
-                self.setFormat(match.capturedStart(), match.capturedLength(), char_format)
+        ])

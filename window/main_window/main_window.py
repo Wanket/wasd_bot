@@ -66,6 +66,7 @@ class MainWindow(QMainWindow):
         self._ui.start_push_button.clicked.connect(self._start_stop_bot)
 
         self._ui.token_line_edit.textChanged.connect(self._token_line_edit_changed)
+        self._ui.channel_line_edit.textChanged.connect(self._channel_line_edit_changed)
 
     def _on_logs(self, message: str):
         self._ui.log_text_edit.append(message)
@@ -122,7 +123,8 @@ class MainWindow(QMainWindow):
         self._settings = self._bot.get_settings()
 
         self._ui.token_line_edit.setText(self._settings.token)
-        self._ui.start_push_button.setEnabled(len(self._settings.token) != 0)
+        self._ui.channel_line_edit.setText(self._settings.channel)
+        self._ui.start_push_button.setEnabled(len(self._settings.token) > 0 and len(self._settings.channel) > 0)
 
         current_command_item = self._ui.commands_list_widget.selectedItems()
         current_command_name = current_command_item[0].text() if current_command_item else None
@@ -287,6 +289,14 @@ class MainWindow(QMainWindow):
     def _token_line_edit_changed(self, text: str):
         self._settings.token = text
 
-        self._ui.start_push_button.setEnabled(len(text) > 0)
+        self._on_base_settings_edited()
+
+    def _channel_line_edit_changed(self, text: str):
+        self._settings.channel = text
+
+        self._on_base_settings_edited()
+
+    def _on_base_settings_edited(self):
+        self._ui.start_push_button.setEnabled(len(self._settings.token) > 0 and len(self._settings.channel) > 0)
 
         self._ui.apply_button_box.setEnabled(True)

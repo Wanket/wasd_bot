@@ -18,7 +18,7 @@ class Bot:
         self._logger = inject.instance(ILogger)
         self._wapi = inject.instance(IWapi)
 
-        self._settings = BotSettings("", {})
+        self._settings = BotSettings("", "", {})
         self._commands: Dict[str, Command] = {}
 
         try:
@@ -26,7 +26,7 @@ class Bot:
         except Exception as e:
             self._logger.error(f"{self.__class__.__name__}: error while loading bot settings, error text: {e}, loading defaults")
 
-            self._reload_settings(BotSettings("", {}))
+            self._reload_settings(BotSettings("", "", {}))
 
     def on_message(self, message: UserMessage):
         if message.text.startswith("!"):

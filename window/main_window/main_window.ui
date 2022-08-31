@@ -38,6 +38,22 @@
            </widget>
           </item>
           <item>
+           <widget class="QLineEdit" name="channel_line_edit">
+            <property name="maximumSize">
+             <size>
+              <width>130</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="inputMask">
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>Имя канала</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="start_push_button">
             <property name="text">
              <string>Сохранить и запустить</string>

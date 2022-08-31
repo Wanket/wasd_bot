@@ -1,9 +1,11 @@
 from PySide6.QtCore import QRegularExpression, Qt
-from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QFont
+from PySide6.QtGui import QTextCharFormat, QFont, QTextDocument
+
+from window.highlight.base_highlighter import BaseHighlighter
 
 
-class LogsHighlighter(QSyntaxHighlighter):
-    def __init__(self, parent: QSyntaxHighlighter):
+class LogsHighlighter(BaseHighlighter):
+    def __init__(self, parent: QTextDocument):
         super().__init__(parent)
 
         time_format = QTextCharFormat()
@@ -33,7 +35,7 @@ class LogsHighlighter(QSyntaxHighlighter):
         exception_format.setFontWeight(QFont.Bold)
         exception_format.setForeground(Qt.darkMagenta)
 
-        self._formats = [
+        self._set_formats([
             (QRegularExpression(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}'), time_format),
             (QRegularExpression(r'INFO:'), info_format),
             (QRegularExpression(r'DEBUG:'), debug_format),
@@ -41,13 +43,4 @@ class LogsHighlighter(QSyntaxHighlighter):
             (QRegularExpression(r'ERROR:'), error_format),
             (QRegularExpression(r'CRITICAL:'), critical_format),
             (QRegularExpression(r'EXCEPTION:'), exception_format),
-        ]
-
-    def highlightBlock(self, text):
-        for pattern, char_format in self._formats:
-            match_it = pattern.globalMatch(text)
-
-            while match_it.hasNext():
-
-                match = match_it.next()
-                self.setFormat(match.capturedStart(), match.capturedLength(), char_format)
+        ])
