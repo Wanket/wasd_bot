@@ -2,6 +2,7 @@ from copy import deepcopy
 from typing import Dict
 
 import inject
+from lazy import lazy
 
 from api.iwapi import IWapi
 from model.answer import Answer
@@ -16,7 +17,6 @@ class Bot:
     def __init__(self):
         self._repository = inject.instance(IRepository)
         self._logger = inject.instance(ILogger)
-        self._wapi = inject.instance(IWapi)
 
         self._settings = BotSettings("", "", {})
         self._commands: Dict[str, Command] = {}
@@ -52,9 +52,9 @@ class Bot:
         self._reload_settings(bot_settings)
 
     def start_bot(self):
-        self._logger.info(f"{self.__class__.__name__}: starting bon")
+        self._logger.info(f"{self.__class__.__name__}: starting bot")
 
-        self._wapi.start_listen(self._settings.token)
+        self._wapi.start_listen(self._settings.token, self._settings.channel)
 
     def stop_bot(self):
         self._logger.info(f"{self.__class__.__name__}: stopping bot")
@@ -75,3 +75,7 @@ class Bot:
         self._commands = commands
 
         self._logger.info(f"{self.__class__.__name__}: bot settings loaded/updated")
+
+    @lazy
+    def _wapi(self) -> IWapi:
+        return inject.instance(IWapi)

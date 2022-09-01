@@ -1,3 +1,4 @@
+import faulthandler
 import sys
 from random import Random
 
@@ -5,6 +6,7 @@ import inject
 from PySide6.QtWidgets import QApplication
 
 from api.iwapi import IWapi
+from api.wapi import Wapi
 from model.util.irandom import IRandom
 from repository.irepository import IRepository
 from repository.repository import Repository
@@ -18,6 +20,8 @@ from window.main_window.main_window import MainWindow
 class App:
     def __init__(self):
         App._setup_di()
+
+        faulthandler.enable()
 
         self._logger = inject.instance(ILogger)
 
@@ -40,7 +44,7 @@ class App:
     def _setup_di():
         inject.configure(
             lambda binder: binder
-            .bind(IWapi, None)
+            .bind_to_constructor(IWapi, Wapi)
             .bind_to_constructor(IRandom, Random)
             .bind_to_constructor(IAppFolders, AppFolders)
             .bind_to_constructor(IRepository, Repository)

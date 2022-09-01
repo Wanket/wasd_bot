@@ -24,3 +24,5 @@ class Repository(IRepository):
 
     def set_bot_settings(self, bot_settings: BotSettings):
         self._db[self._bot_settings_key] = jsonpickle.dumps(bot_settings)
+
+        self._db.commit()

@@ -19,9 +19,9 @@ class IWapi(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def start_listen(self, token: str):
+    def start_listen(self, token: str, channel_name: str):
         pass
 
     @abstractmethod
-    def stop_listen(self, token: str):
+    def stop_listen(self):
         pass

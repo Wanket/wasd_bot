@@ -1,7 +1,9 @@
+import asyncio
 from typing import Optional
 
 import inject
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread
+from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import QMainWindow, QListWidgetItem, QAbstractButton, QDialogButtonBox, QApplication
 
 from model.bot import Bot
@@ -11,6 +13,7 @@ from window.highlight.logs_highlighter import LogsHighlighter
 from window.highlight.message_highlighter import MessageHighlighter
 from window.main_window.ui_main_window import Ui_MainWindow
 from window.main_window.utils import _item_changed, _create_item, _remove_command, _find_unique_name
+from window.util.logs_thread import LogsThread
 
 
 class MainWindow(QMainWindow):
@@ -21,6 +24,8 @@ class MainWindow(QMainWindow):
         self._ui.setupUi(self)
 
         self._setup_ui()
+
+        self._logs_thread = LogsThread(self)
 
         self._setup_logs()
 
@@ -34,11 +39,16 @@ class MainWindow(QMainWindow):
 
         self._bot_is_running = False
 
-    def _setup_logs(self):
-        logger = inject.instance(ILogger)
-        logger.register_logging_handler(self._on_logs)
+    def closeEvent(self, event: QCloseEvent):
+        self._logs_thread.stop()
 
+        event.accept()
+
+    def _setup_logs(self):
         LogsHighlighter(self._ui.log_text_edit.document())
+
+        self._logs_thread.on_log.connect(self._on_logs)
+        self._logs_thread.start()
 
     def _setup_ui(self):
         MessageHighlighter(self._ui.answer_text_edit.document())
@@ -276,13 +286,14 @@ class MainWindow(QMainWindow):
         if self._bot_is_running:
             self._bot.stop_bot()
         else:
-            self._ui.apply_button_box.button(QDialogButtonBox.Save).click()
+            self._apply_button_clicked(self._ui.apply_button_box.button(QDialogButtonBox.Save))
 
             self._bot.start_bot()
 
         self._bot_is_running = not self._bot_is_running
 
         self._ui.token_line_edit.setEnabled(not self._bot_is_running)
+        self._ui.channel_line_edit.setEnabled(not self._bot_is_running)
 
         self._ui.start_push_button.setText("Стоп" if self._bot_is_running else "Сохранить и запустить")
 
