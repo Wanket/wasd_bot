@@ -44,6 +44,10 @@ class Wapi(IWapi):
         self._game_name: Optional[str] = None
         self._stream_started_date: Optional[datetime] = None
 
+        self._users_total: Optional[int] = None
+        self._users_auth: Optional[int] = None
+        self._users_anon: Optional[int] = None
+
     def send_message(self, text: str):
         async def test():
             await self._socket.emit("message", {
@@ -86,6 +90,15 @@ class Wapi(IWapi):
         finally:
             if self._socket.connected:
                 asyncio.run_coroutine_threadsafe(self._socket.disconnect(), self._event_loop).result()
+
+    def get_users_count_total(self):
+        return self._users_total
+
+    def get_users_count_auth(self):
+        return self._users_auth
+
+    def get_users_count_anon(self):
+        return self._users_anon
 
     def _start_event_loop_thread(self):
         def start_event_loop():
@@ -227,5 +240,11 @@ class Wapi(IWapi):
         @socket.event
         async def highlighted_message(data):
             self._bot.on_message(UserMessage(user_id=int(data["user_id"]), user_name=data["user_login"], text=data["message"]))
+
+        @socket.event
+        async def viewers(data):
+            self._users_anon = data["anon"]
+            self._users_auth = data["auth"]
+            self._users_total = data["total"]
 
         return socket

@@ -22,11 +22,18 @@ class Answer:
             self._wapi.send_message(self._prepare_message(message))
 
     def _prepare_message(self, message: UserMessage) -> str:
+        users_total = self._wapi.get_users_count_total()
+        users_auth = self._wapi.get_users_count_auth()
+        users_anon = self._wapi.get_users_count_anon()
+
         return self._template.substitute(KeyDefaultDict(
             lambda x: f"${x}",
             uptime=Answer._format_time(self._wapi.get_stream_time()),
             game_name=self._wapi.get_game_name(),
             user_name=message.user_name,
+            users_count_total=users_total if users_total is not None else "(нет данных)",
+            users_count_auth=users_auth if users_auth is not None else "(нет данных)",
+            users_count_anon=users_anon if users_anon is not None else "(нет данных)",
         ))
 
     @lazy

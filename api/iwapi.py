@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABCMeta
+from typing import Optional
 
 
 class IWapi(metaclass=ABCMeta):
@@ -24,4 +25,16 @@ class IWapi(metaclass=ABCMeta):
 
     @abstractmethod
     def stop_listen(self):
+        pass
+
+    @abstractmethod
+    def get_users_count_total(self) -> Optional[int]:
+        pass
+
+    @abstractmethod
+    def get_users_count_auth(self) -> Optional[int]:
+        pass
+
+    @abstractmethod
+    def get_users_count_anon(self) -> Optional[int]:
         pass

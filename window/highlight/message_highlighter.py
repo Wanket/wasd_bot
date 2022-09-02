@@ -17,8 +17,20 @@ class MessageHighlighter(BaseHighlighter):
         user_name_format = QTextCharFormat()
         user_name_format.setForeground(Qt.darkBlue)
 
+        users_count_total_format = QTextCharFormat()
+        users_count_total_format.setForeground(Qt.darkRed)
+
+        users_count_auth_format = QTextCharFormat()
+        users_count_auth_format.setForeground(Qt.darkYellow)
+
+        users_count_anon_format = QTextCharFormat()
+        users_count_anon_format.setForeground(Qt.darkMagenta)
+
         self._set_formats([
             (QRegularExpression(r'(\W|^)\$uptime(\W|$)'), uptime_format),
             (QRegularExpression(r'(\W|^)\$game_name(\W|$)'), game_name_format),
             (QRegularExpression(r'(\W|^)\$user_name(\W|$)'), user_name_format),
+            (QRegularExpression(r'(\W|^)\$users_count_total(\W|$)'), users_count_total_format),
+            (QRegularExpression(r'(\W|^)\$users_count_auth(\W|$)'), users_count_auth_format),
+            (QRegularExpression(r'(\W|^)\$users_count_anon(\W|$)'), users_count_anon_format),
         ])
