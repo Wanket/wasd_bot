@@ -1,14 +1,13 @@
-import asyncio
 from typing import Optional
 
 import inject
-from PySide6.QtCore import Qt, QThread
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QCloseEvent
-from PySide6.QtWidgets import QMainWindow, QListWidgetItem, QAbstractButton, QDialogButtonBox, QApplication
+from PySide6.QtWidgets import QMainWindow, QListWidgetItem, QAbstractButton, QDialogButtonBox
 
 from model.bot import Bot
 from model.settings.answer_settings import AnswerSettings
-from util.ilogger import ILogger
+from model.settings.command_settings import CommandSettings
 from window.highlight.logs_highlighter import LogsHighlighter
 from window.highlight.message_highlighter import MessageHighlighter
 from window.main_window.ui_main_window import Ui_MainWindow
@@ -78,22 +77,24 @@ class MainWindow(QMainWindow):
         self._ui.token_line_edit.textChanged.connect(self._token_line_edit_changed)
         self._ui.channel_line_edit.textChanged.connect(self._channel_line_edit_changed)
 
+        self._ui.timeout_spin_box.valueChanged.connect(self._timeout_spin_box_changed)
+
     def _on_logs(self, message: str):
         self._ui.log_text_edit.append(message)
 
     def _add_command_clicked(self):
         command_name = _find_unique_name("Новая команда", self._settings.commands)
 
-        self._settings.commands[command_name] = {}
+        self._settings.commands[command_name] = CommandSettings(0, {})
 
         self._add_command(command_name)
 
         self._ui.apply_button_box.setEnabled(True)
 
     def _add_answer_clicked(self):
-        answer_name = _find_unique_name("Новый ответ", self._settings.commands[self._activated_command])
+        answer_name = _find_unique_name("Новый ответ", self._settings.commands[self._activated_command].answers)
 
-        self._settings.commands[self._activated_command][answer_name] = AnswerSettings(1, "", False)
+        self._settings.commands[self._activated_command].answers[answer_name] = AnswerSettings(1, "", False)
 
         self._add_answer(answer_name)
 
@@ -122,7 +123,7 @@ class MainWindow(QMainWindow):
         self._ui.apply_button_box.setEnabled(True)
 
     def _remove_answer_clicked(self):
-        if _remove_command(self._ui.answers_list_widget, self._settings.commands[self._activated_command], self._ui.remove_answer_button):
+        if _remove_command(self._ui.answers_list_widget, self._settings.commands[self._activated_command].answers, self._ui.remove_answer_button):
             current_command_item = self._ui.commands_list_widget.selectedItems()[0]
             current_item = self._ui.answers_list_widget.currentItem()
             self._reload_answer_settings(current_command_item.text(), current_item.text() if current_item else None)
@@ -165,14 +166,19 @@ class MainWindow(QMainWindow):
 
         current_answer = None
 
-        if current_command and current_command in self._settings.commands:
-            for key in self._settings.commands[current_command].keys():
+        current_command_exists = current_command is not None and current_command in self._settings.commands
+
+        self._ui.timeout_spin_box.setValue(self._settings.commands[current_command].timeout if current_command_exists else 0)
+        self._ui.timeout_spin_box.setEnabled(current_command_exists)
+
+        if current_command_exists:
+            for key in self._settings.commands[current_command].answers.keys():
                 item = QListWidgetItem(key)
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
 
                 self._ui.answers_list_widget.addItem(item)
 
-            if current_answer_name and current_answer_name in self._settings.commands[current_command]:
+            if current_answer_name and current_answer_name in self._settings.commands[current_command].answers:
                 current_answer = current_answer_name
 
         if current_answer:
@@ -190,8 +196,8 @@ class MainWindow(QMainWindow):
     def _reload_answer_settings(self, current_command: Optional[str], current_answer: Optional[str]):
         is_enabled = current_command is not None and current_answer is not None
 
-        if is_enabled and current_command in self._settings.commands and current_answer in self._settings.commands[current_command]:
-            answer_settings = self._settings.commands[current_command][current_answer]
+        if is_enabled and current_command in self._settings.commands and current_answer in self._settings.commands[current_command].answers:
+            answer_settings = self._settings.commands[current_command].answers[current_answer]
         else:
             answer_settings = AnswerSettings(1, "", False)
 
@@ -240,7 +246,7 @@ class MainWindow(QMainWindow):
         self._answer_command = _item_changed(
             item,
             self._activated_answer,
-            self._settings.commands[self._ui.commands_list_widget.selectedItems()[0].text()]
+            self._settings.commands[self._ui.commands_list_widget.selectedItems()[0].text()].answers
         )
 
         self._reload_answer_settings(self._activated_command, self._answer_command)
@@ -265,6 +271,12 @@ class MainWindow(QMainWindow):
 
             self._ui.apply_button_box.setEnabled(True)
 
+    def _timeout_spin_box_changed(self, value: int):
+        if self._ui.timeout_spin_box.isEnabled():
+            self._get_current_command_settings().timeout = value
+
+            self._ui.apply_button_box.setEnabled(True)
+
     def _apply_button_clicked(self, button: QAbstractButton):
         if button == self._ui.apply_button_box.button(QDialogButtonBox.Save):
             self._bot.set_settings(self._settings)
@@ -277,10 +289,18 @@ class MainWindow(QMainWindow):
         command_name = self._ui.commands_list_widget.selectedItems()[0].text()
         answer_name = self._ui.answers_list_widget.selectedItems()[0].text()
 
-        if command_name in self._settings.commands and answer_name in self._settings.commands[command_name]:
-            return self._settings.commands[command_name][answer_name]
+        if command_name in self._settings.commands and answer_name in self._settings.commands[command_name].answers:
+            return self._settings.commands[command_name].answers[answer_name]
 
         return AnswerSettings(1, "", False)
+
+    def _get_current_command_settings(self) -> CommandSettings:
+        command_name = self._ui.commands_list_widget.selectedItems()[0].text()
+
+        if command_name in self._settings.commands:
+            return self._settings.commands[command_name]
+
+        return CommandSettings(0, {})
 
     def _start_stop_bot(self):
         if self._bot_is_running:

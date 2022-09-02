@@ -127,6 +127,26 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.answers_list_widget)
 
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.label_6 = QLabel(self.layoutWidget1)
+        self.label_6.setObjectName(u"label_6")
+
+        self.horizontalLayout_5.addWidget(self.label_6)
+
+        self.horizontalSpacer_4 = QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_4)
+
+        self.timeout_spin_box = QSpinBox(self.layoutWidget1)
+        self.timeout_spin_box.setObjectName(u"timeout_spin_box")
+        self.timeout_spin_box.setMaximum(999)
+
+        self.horizontalLayout_5.addWidget(self.timeout_spin_box)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+
         self.horizontalLayout_6 = QHBoxLayout()
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.add_answer_button = QPushButton(self.layoutWidget1)
@@ -260,6 +280,8 @@ class Ui_MainWindow(object):
         self.add_command_button.setText(QCoreApplication.translate("MainWindow", u"+", None))
         self.remove_command_button.setText(QCoreApplication.translate("MainWindow", u"-", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442\u0432\u0435\u0442\u044b", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u0422\u0430\u0439\u043c\u0430\u0443\u0442 \u043a\u043e\u043c\u0430\u043d\u0434\u044b", None))
+        self.timeout_spin_box.setSuffix(QCoreApplication.translate("MainWindow", u" \u0441\u0435\u043a", None))
         self.add_answer_button.setText(QCoreApplication.translate("MainWindow", u"+", None))
         self.remove_answer_button.setText(QCoreApplication.translate("MainWindow", u"-", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u0422\u0435\u043a\u0441\u0442 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f", None))

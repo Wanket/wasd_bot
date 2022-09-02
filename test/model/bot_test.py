@@ -1,3 +1,4 @@
+from datetime import datetime
 from random import Random
 from unittest import TestCase
 from unittest.mock import Mock
@@ -8,7 +9,9 @@ from api.iwapi import IWapi
 from model.bot import Bot
 from model.settings.answer_settings import AnswerSettings
 from model.settings.bot_settings import BotSettings
+from model.settings.command_settings import CommandSettings
 from model.user_message import UserMessage
+from model.util.idatetime import IDateTime
 from model.util.irandom import IRandom
 from repository.irepository import IRepository
 from util.ilogger import ILogger
@@ -19,6 +22,7 @@ class TestBot(TestCase):
         self.wapi_mock = Mock()
         self.repository_mock = Mock()
         self.logger_mock = Mock()
+        self.date_time_mock = Mock()
 
         inject.clear_and_configure(
             lambda binder: binder
@@ -26,6 +30,7 @@ class TestBot(TestCase):
             .bind(IRepository, self.repository_mock)
             .bind(ILogger, self.logger_mock)
             .bind(IRandom, Random())
+            .bind(IDateTime, self.date_time_mock)
         )
 
     def test_set_settings(self):
@@ -34,7 +39,7 @@ class TestBot(TestCase):
         bot = Bot()
 
         settings = BotSettings(token="test_token", commands={
-            "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
+            "test_command": CommandSettings(0, {"test_answer": AnswerSettings(1, "message_template", False)})
         }, channel="test_channel")
 
         bot.set_settings(settings)
@@ -43,7 +48,7 @@ class TestBot(TestCase):
 
     def test_get_settings(self):
         settings = BotSettings(token="test_token", commands={
-            "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
+            "test_command": CommandSettings(0, {"test_answer": AnswerSettings(1, "message_template", False)})
         }, channel="test_channel")
 
         self.repository_mock.get_bot_settings.return_value = settings
@@ -56,10 +61,11 @@ class TestBot(TestCase):
 
     def test_on_message(self):
         settings = BotSettings(token="test_token", commands={
-            "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
+            "test_command": CommandSettings(0, {"test_answer": AnswerSettings(1, "message_template", False)})
         }, channel="test_channel")
 
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.date_time_mock.now.return_value = datetime(2020, 1, 1)
 
         self.repository_mock.get_bot_settings.return_value = settings
 

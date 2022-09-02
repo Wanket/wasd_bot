@@ -163,6 +163,34 @@
              </widget>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Таймаут команды</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="timeout_spin_box">
+                <property name="suffix">
+                 <string> сек</string>
+                </property>
+                <property name="maximum">
+                 <number>999</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
                <widget class="QPushButton" name="add_answer_button">

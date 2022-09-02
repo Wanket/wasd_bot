@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-from typing import Dict, Tuple
+from typing import Dict
 
-from model.settings.answer_settings import AnswerSettings
+from model.settings.command_settings import CommandSettings
 
 
 @dataclass
 class BotSettings:
     channel: str
     token: str
-    commands: Dict[str, Dict[str, AnswerSettings]]
+    commands: Dict[str, CommandSettings]
