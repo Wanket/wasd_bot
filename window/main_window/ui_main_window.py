@@ -243,6 +243,7 @@ class Ui_MainWindow(object):
         self.label_5.setObjectName(u"label_5")
         self.label_5.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
         self.label_5.setWordWrap(True)
+        self.label_5.setOpenExternalLinks(True)
 
         self.verticalLayout_7.addWidget(self.label_5)
 

@@ -45,10 +45,10 @@ class Logger(ILogger):
     def set_level(self, level: int):
         self._logger.setLevel(level)
 
-    def register_logging_handler(self, handler: Callable[[str], None]):
+    def register_logging_handler(self, handler: Callable[[str], None], level: int = logging.INFO):
         handler = LoggingHandler(handler)
         handler.setFormatter(logging.Formatter(self._log_format))
-        handler.setLevel(logging.DEBUG)
+        handler.setLevel(level)
 
         self._logger.addHandler(handler)
 

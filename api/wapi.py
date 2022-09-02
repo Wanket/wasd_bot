@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from asyncio import CancelledError, Future
 from concurrent import futures
 from datetime import datetime
@@ -25,17 +26,19 @@ class Wapi(IWapi):
         self._event_loop = asyncio.new_event_loop()
         self._start_event_loop_thread()
 
-        asyncio.run_coroutine_threadsafe(self._load_stream_data_loop(), self._event_loop)
-
         self._http_client = ClientSession(loop=self._event_loop)
 
         self._socket = asyncio.run_coroutine_threadsafe(self._setup_socket(), self._event_loop).result()
         self._socket_task: Optional[Future[None]] = None
 
+        asyncio.run_coroutine_threadsafe(self._load_stream_data_loop(), self._event_loop)
+
         self._token: Optional[str] = None
         self._channel_name: Optional[str] = None
 
         self._jwt: Optional[str] = None
+
+        self._channel_is_live: bool = False
 
         self._channel_id: Optional[int] = None
         self._stream_id: Optional[int] = None
@@ -110,15 +113,10 @@ class Wapi(IWapi):
 
     async def _start_listen_impl(self):
         while True:
-            self._logger.info(f"{self.__class__.__name__}: loading stream data")
-
-            while not await self._load_stream_data(load_jwt=True):
-                await asyncio.sleep(1)
-
-            self._logger.info(f"{self.__class__.__name__}: stream data loaded")
+            await self._load_data_loop()
 
             try:
-                self._logger.info(f"{self.__class__.__name__}: connecting to chat")
+                self._logger.info(f"{self.__class__.__name__}: connecting")
 
                 await self._socket_loop()
             except (CancelledError, futures.CancelledError):
@@ -130,6 +128,17 @@ class Wapi(IWapi):
             finally:
                 if self._socket.connected:
                     await self._socket.disconnect()
+
+    async def _load_data_loop(self):
+        self._logger.info(f"{self.__class__.__name__}: loading stream data")
+
+        while not await self._load_stream_data(load_jwt=True, retrying_postfix="1 second") or not self._channel_is_live:
+            if not self._channel_is_live:
+                self._logger.warning(f"{self.__class__.__name__}: channel {self._channel_name} is not live, rechecking in 1 second")
+
+            await asyncio.sleep(1)
+
+        self._logger.info(f"{self.__class__.__name__}: stream data loaded")
 
     async def _ban_user_impl(self, user_id: int):
         async with self._http_client.put(
@@ -146,12 +155,21 @@ class Wapi(IWapi):
 
     async def _load_stream_data_loop(self):
         while True:
-            if self._socket.connected and not await self._load_stream_data(load_jwt=False):
-                self._logger.info(f"{self.__class__.__name__}: cannot update stream data, retrying in 1 minute")
+            if self._socket.connected:
+                old_stream_id = self._stream_id
+
+                await self._load_stream_data(load_jwt=False, retrying_postfix="1 minute")
+
+                if not self._channel_is_live or old_stream_id != self._stream_id:
+                    await self._socket.disconnect()
+
+                    await self._load_data_loop()
+
+                    await self._socket.connect("wss://chat.wasd.tv")
 
             await asyncio.sleep(60)
 
-    async def _load_stream_data(self, load_jwt: bool) -> bool:
+    async def _load_stream_data(self, load_jwt: bool, retrying_postfix: str) -> bool:
         try:
             if load_jwt:
                 async with self._http_client.post(f"https://wasd.tv/api/auth/chat-token",
@@ -159,7 +177,7 @@ class Wapi(IWapi):
                     if response.status // 100 != 2:
                         self._logger.error(
                             f"{self.__class__.__name__}: failed to get chat token,"
-                            f" status: {response.status}, data: {await response.text()}, retrying in 1 second"
+                            f" status: {response.status}, data: {await response.text()}, retrying in {retrying_postfix}"
                         )
 
                         return False
@@ -170,17 +188,17 @@ class Wapi(IWapi):
                 if response.status != 200:
                     self._logger.error(
                         f"{self.__class__.__name__}: failed to load stream data,"
-                        f" status: {response.status}, data: {await response.text()}, retrying in 1 second"
+                        f" status: {response.status}, data: {await response.text()}, retrying in {retrying_postfix}"
                     )
 
                     return False
 
                 channel_info = await response.json()
 
-            if not channel_info["result"]["channel"]["channel_is_live"]:
-                self._logger.info(f"{self.__class__.__name__}: channel {self._channel_name} is not live, rechecking in 1 second")
+            self._channel_is_live = channel_info["result"]["channel"]["channel_is_live"]
 
-                return False
+            if not self._channel_is_live:
+                return True
 
             channel_id = channel_info["result"]["channel"]["channel_id"]
             stream_id = channel_info["result"]["media_container"]["media_container_streams"][0]["stream_id"]
@@ -198,7 +216,7 @@ class Wapi(IWapi):
         except (CancelledError, futures.CancelledError):
             raise
         except Exception as e:
-            self._logger.exception(f"{self.__class__.__name__}: got error while loading stream data, error: {e}, retrying in 1 second")
+            self._logger.exception(f"{self.__class__.__name__}: got error while loading stream data, error: {e}, retrying in {retrying_postfix}")
 
             return False
 
@@ -208,11 +226,15 @@ class Wapi(IWapi):
         await self._socket.wait()
 
     async def _setup_socket(self):
-        socket = socketio.AsyncClient()
+        socket = socketio.AsyncClient(logger=logging.Logger("socketio"), engineio_logger=logging.Logger("engineio"))
 
         @socket.event
         async def connect():
-            self._logger.info(f"{self.__class__.__name__}: connected to chat")
+            self._logger.info(f"{self.__class__.__name__}: connected, wait because wasd is stupid")
+
+            await self._socket.sleep(5)
+
+            self._logger.info(f"{self.__class__.__name__}: wait finished, try to join")
 
             await self._socket.emit("join", {
                 "channelId": self._channel_id,
@@ -223,7 +245,7 @@ class Wapi(IWapi):
 
         @socket.event
         async def disconnect():
-            self._logger.info(f"{self.__class__.__name__}: disconnected from chat")
+            self._logger.info(f"{self.__class__.__name__}: disconnected")
 
         @socket.event
         async def connect_error(data):
