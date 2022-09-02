@@ -1,7 +1,7 @@
 from datetime import datetime
 from random import Random
 from unittest import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 import inject
 
@@ -61,7 +61,7 @@ class TestBot(TestCase):
 
     def test_on_message(self):
         settings = BotSettings(token="test_token", commands={
-            "test_command": CommandSettings(0, {"test_answer": AnswerSettings(1, "message_template", False)})
+            "Test_Command": CommandSettings(0, {"test_answer": AnswerSettings(1, "message_template", False)})
         }, channel="test_channel")
 
         self.wapi_mock.get_stream_time.return_value = 12345
@@ -75,7 +75,11 @@ class TestBot(TestCase):
 
         bot.on_message(message)
 
-        self.wapi_mock.send_message.assert_called_once_with("message_template")
+        message = UserMessage(42, "user_name", "!TeSt_cOmMaNd")
+
+        bot.on_message(message)
+
+        self.wapi_mock.send_message.assert_has_calls([call("message_template"), call("message_template")])
 
     def test_repository_exceptions(self):
         self.repository_mock.get_bot_settings.side_effect = Exception("test_exception")
@@ -93,3 +97,26 @@ class TestBot(TestCase):
         bot.set_settings(settings)
 
         self.logger_mock.error.assert_called_with("Bot: error while saving bot settings, error text: test_exception")
+
+    def test_many_words(self):
+        settings = BotSettings(token="test_token", commands={
+            "Test Command": CommandSettings(0, {"test_answer": AnswerSettings(1, "Test Command", False)}),
+            "Test": CommandSettings(0, {"test_answer": AnswerSettings(1, "Test", False)}),
+        }, channel="test_channel")
+
+        self.wapi_mock.get_stream_time.return_value = 12345
+        self.date_time_mock.now.return_value = datetime(2020, 1, 1)
+
+        self.repository_mock.get_bot_settings.return_value = settings
+
+        bot = Bot()
+
+        message = UserMessage(0, "", "!test command")
+
+        bot.on_message(message)
+
+        message = UserMessage(0, "", "!test another")
+
+        bot.on_message(message)
+
+        self.wapi_mock.send_message.assert_has_calls([call("Test Command"), call("Test")])

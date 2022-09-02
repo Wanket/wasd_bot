@@ -3,10 +3,12 @@ from PySide6.QtWidgets import QListWidget, QPushButton, QListWidgetItem
 
 
 def _find_unique_name(name_template: str, names: dict) -> str:
+    lower_names = {name.lower() for name in names.keys()}
+
     name = name_template
 
     i = 1
-    while name in names:
+    while name.lower() in lower_names:
         i += 1
         name = f"{name_template} ({i})"
 
@@ -38,7 +40,7 @@ def _item_changed(item: QListWidgetItem, activated_name: str, check_in_dict: dic
     if activated_name == new_name:
         return activated_name
 
-    if new_name.isspace() or new_name in check_in_dict:
+    if new_name == "" or new_name.isspace() or new_name.lower() in {key.lower() for key in check_in_dict.keys()}:
         item.setText(activated_name)
 
         return activated_name

@@ -29,14 +29,23 @@ class Bot:
             self._reload_settings(BotSettings("", "", {}))
 
     def on_message(self, message: UserMessage):
-        if message.text.startswith("!"):
-            words = message.text[1:].split()
+        if not message.text.startswith("!"):
+            return
 
-            command = self._commands.get(words[0])
-            if command:
-                message.text = message.text[len(words[0]) + 1:]
+        message.text = message.text[1:]
 
-                command.exec(message)
+        lower_text = message.text.lower()
+
+        max_length = 0
+        max_command = None
+
+        for command_name, command in self._commands.items():
+            if lower_text.startswith(command_name) and len(command_name) > max_length:
+                max_length = len(command_name)
+                max_command = command
+
+        if max_command:
+            max_command.exec(message)
 
     def get_settings(self) -> BotSettings:
         return deepcopy(self._settings)
@@ -70,7 +79,7 @@ class Bot:
             for _, answer_settings in command.answers.items():
                 answers.append((answer_settings.rate, Answer(answer_settings.template, answer_settings.ban)))
 
-            commands[name] = Command(answers, command.timeout)
+            commands[name.lower()] = Command(answers, command.timeout)
 
         self._commands = commands
 
