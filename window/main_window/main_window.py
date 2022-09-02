@@ -295,7 +295,11 @@ class MainWindow(QMainWindow):
         return AnswerSettings(1, "", False)
 
     def _get_current_command_settings(self) -> CommandSettings:
-        command_name = self._ui.commands_list_widget.selectedItems()[0].text()
+        command_name_items = self._ui.commands_list_widget.selectedItems()
+        if not command_name_items:
+            return CommandSettings(0, {})
+
+        command_name = command_name_items[0].text()
 
         if command_name in self._settings.commands:
             return self._settings.commands[command_name]
