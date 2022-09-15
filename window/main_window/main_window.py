@@ -39,6 +39,9 @@ class MainWindow(QMainWindow):
         self._bot_is_running = False
 
     def closeEvent(self, event: QCloseEvent):
+        if self._bot_is_running:
+            self._bot.stop_bot()
+
         self._logs_thread.stop()
 
         event.accept()

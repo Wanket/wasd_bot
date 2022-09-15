@@ -226,7 +226,12 @@ class Wapi(IWapi):
         await self._socket.wait()
 
     async def _setup_socket(self):
-        socket = socketio.AsyncClient(logger=logging.Logger("socketio"), engineio_logger=logging.Logger("engineio"))
+        socket = socketio.AsyncClient(
+            logger=logging.Logger("socketio"),
+            engineio_logger=logging.Logger("engineio"),
+            reconnection_delay_max=60,
+            randomization_factor=0,
+        )
 
         @socket.event
         async def connect():
