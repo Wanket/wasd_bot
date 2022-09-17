@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import Optional
+from typing import Optional, List
 
 
 class IWapi(metaclass=ABCMeta):
@@ -37,4 +37,8 @@ class IWapi(metaclass=ABCMeta):
 
     @abstractmethod
     def get_users_count_anon(self) -> Optional[int]:
+        pass
+
+    @abstractmethod
+    def get_users_list(self) -> List[str]:
         pass

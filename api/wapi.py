@@ -4,7 +4,7 @@ from asyncio import CancelledError, Future
 from concurrent import futures
 from datetime import datetime
 from threading import Thread
-from typing import Optional
+from typing import Optional, List
 
 import inject
 import socketio
@@ -50,6 +50,8 @@ class Wapi(IWapi):
         self._users_total: Optional[int] = None
         self._users_auth: Optional[int] = None
         self._users_anon: Optional[int] = None
+
+        self._users_list: List[str] = []
 
     def send_message(self, text: str):
         async def test():
@@ -102,6 +104,9 @@ class Wapi(IWapi):
 
     def get_users_count_anon(self):
         return self._users_anon
+
+    def get_users_list(self) -> List[str]:
+        return self._users_list
 
     def _start_event_loop_thread(self):
         def start_event_loop():
@@ -206,11 +211,24 @@ class Wapi(IWapi):
             game_name = channel_info["result"]["media_container"]["game"]["game_name"]
             stream_started_date = isoparse(channel_info["result"]["media_container"]["published_at"])
 
+            async with self._http_client.get(f"https://wasd.tv/api/chat/streams/{stream_id}/participants") as response:
+                if response.status != 200:
+                    self._logger.error(
+                        f"{self.__class__.__name__}: failed to load stream participants,"
+                        f" status: {response.status}, data: {await response.text()}, retrying in {retrying_postfix}"
+                    )
+
+                    return False
+
+            users = [user["user_login"] for user in (await response.json())["result"]]
+
             self._channel_id = channel_id
             self._stream_id = stream_id
             self._streamer_id = streamer_id
             self._game_name = game_name
             self._stream_started_date = stream_started_date
+
+            self._users_list = users
 
             return True
         except (CancelledError, futures.CancelledError):

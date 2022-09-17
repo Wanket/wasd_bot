@@ -65,6 +65,8 @@ class TestBot(TestCase):
         }, channel="test_channel")
 
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = []
+
         self.date_time_mock.now.return_value = datetime(2020, 1, 1)
 
         self.repository_mock.get_bot_settings.return_value = settings
@@ -105,6 +107,8 @@ class TestBot(TestCase):
         }, channel="test_channel")
 
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = []
+
         self.date_time_mock.now.return_value = datetime(2020, 1, 1)
 
         self.repository_mock.get_bot_settings.return_value = settings

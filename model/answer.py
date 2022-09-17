@@ -1,4 +1,3 @@
-from string import Template
 from typing import Optional
 
 import inject
@@ -6,13 +5,17 @@ from lazy import lazy
 
 from api.iwapi import IWapi
 from model.user_message import UserMessage
-from model.util.key_default_dict import KeyDefaultDict
+from model.util.answer_substitution_dict import AnswerSubstitutionDict
+from model.util.answer_substitution_template import AnswerSubstitutionTemplate
+from model.util.irandom import IRandom
 
 
 class Answer:
     def __init__(self, template: Optional[str], ban: bool):
-        self._template = Template(template) if template else None
+        self._template = AnswerSubstitutionTemplate(template) if template else None
         self._ban = ban
+
+        self._rand = inject.instance(IRandom)
 
     def exec(self, message: UserMessage):
         if self._ban:
@@ -26,14 +29,17 @@ class Answer:
         users_auth = self._wapi.get_users_count_auth()
         users_anon = self._wapi.get_users_count_anon()
 
-        return self._template.substitute(KeyDefaultDict(
-            lambda x: f"${x}",
+        users_list = self._wapi.get_users_list()
+
+        return self._template.safe_substitute(AnswerSubstitutionDict(
             uptime=Answer._format_time(self._wapi.get_stream_time()),
             game_name=self._wapi.get_game_name(),
             user_name=message.user_name,
             users_count_total=users_total if users_total is not None else "(нет данных)",
             users_count_auth=users_auth if users_auth is not None else "(нет данных)",
             users_count_anon=users_anon if users_anon is not None else "(нет данных)",
+            random_user=self._rand.choice(users_list) if users_list else "(чат пуст)",
+            random_number=self._rand.random(),
         ))
 
     @lazy

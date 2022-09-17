@@ -8,29 +8,35 @@ class MessageHighlighter(BaseHighlighter):
     def __init__(self, parent: QTextDocument):
         super().__init__(parent)
 
-        uptime_format = QTextCharFormat()
-        uptime_format.setForeground(Qt.darkCyan)
+        command_format = QTextCharFormat()
+        command_format.setForeground(Qt.darkYellow)
 
-        game_name_format = QTextCharFormat()
-        game_name_format.setForeground(Qt.darkGreen)
+        commands_generic = ["uptime", "game_name", "user_name", "users_count_total", "users_count_auth", "users_count_anon", "random_user"]
+        commands_functions = ["random_number"]
 
-        user_name_format = QTextCharFormat()
-        user_name_format.setForeground(Qt.darkBlue)
+        command_regex = QRegularExpression(rf"\${{({'|'.join(commands_generic)})}}")
 
-        users_count_total_format = QTextCharFormat()
-        users_count_total_format.setForeground(Qt.darkRed)
-
-        users_count_auth_format = QTextCharFormat()
-        users_count_auth_format.setForeground(Qt.darkYellow)
-
-        users_count_anon_format = QTextCharFormat()
-        users_count_anon_format.setForeground(Qt.darkMagenta)
+        # noinspection RegExpUnnecessaryNonCapturingGroup
+        self._function_regex = QRegularExpression(rf"(\${{(?:{'|'.join(commands_functions)})\()([^)]*)(\)}})")
 
         self._set_formats([
-            (QRegularExpression(r'(\W|^)\$uptime(\W|$)'), uptime_format),
-            (QRegularExpression(r'(\W|^)\$game_name(\W|$)'), game_name_format),
-            (QRegularExpression(r'(\W|^)\$user_name(\W|$)'), user_name_format),
-            (QRegularExpression(r'(\W|^)\$users_count_total(\W|$)'), users_count_total_format),
-            (QRegularExpression(r'(\W|^)\$users_count_auth(\W|$)'), users_count_auth_format),
-            (QRegularExpression(r'(\W|^)\$users_count_anon(\W|$)'), users_count_anon_format),
+            (command_regex, command_format),
         ])
+
+    def highlightBlock(self, text):
+        super().highlightBlock(text)
+
+        matches = self._function_regex.globalMatch(text)
+
+        while matches.hasNext():
+            match = matches.next()
+
+            self.setFormat(match.capturedStart(1), match.capturedLength(1), Qt.darkYellow)
+            self.setFormat(match.capturedStart(3), match.capturedLength(3), Qt.darkYellow)
+
+            sub_matches = QRegularExpression(r"[^,]+").globalMatch(match.captured(2))
+
+            while sub_matches.hasNext():
+                sub_match = sub_matches.next()
+
+                self.setFormat(match.capturedStart(2) + sub_match.capturedStart(), sub_match.capturedLength(), Qt.darkCyan)
