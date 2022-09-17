@@ -14,6 +14,8 @@ def main():
     else:
         logger.info(f"{__name__}: application exited successfully")
 
+    return err_code
+
 
 if __name__ == "__main__":
-    main()
+    exit(main())

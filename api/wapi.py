@@ -108,6 +108,11 @@ class Wapi(IWapi):
     def get_users_list(self) -> List[str]:
         return self._users_list
 
+    def on_close(self):
+        self._event_loop.stop()
+
+        self.stop_listen()
+
     def _start_event_loop_thread(self):
         def start_event_loop():
             asyncio.set_event_loop(self._event_loop)

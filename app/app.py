@@ -28,6 +28,11 @@ class App:
 
         self._logger.info(f"{self.__class__.__name__}: created")
 
+    def __del__(self):
+        inject.instance(IWapi).on_close()
+
+        self._logger.info(f"{self.__class__.__name__}: destroyed")
+
     def run(self) -> int:
         self._logger.info(f"{self.__class__.__name__}: running")
 

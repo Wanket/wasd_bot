@@ -42,3 +42,7 @@ class IWapi(metaclass=ABCMeta):
     @abstractmethod
     def get_users_list(self) -> List[str]:
         pass
+
+    @abstractmethod
+    def on_close(self):
+        pass
