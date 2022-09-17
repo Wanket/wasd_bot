@@ -225,7 +225,7 @@ class Wapi(IWapi):
 
                     return False
 
-            users = [user["user_login"] for user in (await response.json())["result"]]
+                users = [user["user_login"] for user in (await response.json())["result"]]
 
             self._channel_id = channel_id
             self._stream_id = stream_id

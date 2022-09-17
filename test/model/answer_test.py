@@ -28,7 +28,7 @@ class TestAnswer(TestCase):
         answer.exec(UserMessage(42, "test_user", "test_message"))
 
         self.wapi_mock.get_stream_time.assert_called_once_with()
-        self.wapi_mock.send_message.assert_called_once_with("время 3 часов 25 минут 45 секунд, игра test game, написал пользователь test_user")
+        self.wapi_mock.send_message.assert_called_once_with("время 3 часа 25 минут 45 секунд, игра test game, написал пользователь test_user")
 
     def test_smart_placeholder(self):
         self.wapi_mock.get_stream_time.return_value = 12345
@@ -60,7 +60,7 @@ class TestAnswer(TestCase):
 
         answer = Answer("время ${uptime}", False)
 
-        for expected in ["время 3 часов 25 минут 45 секунд", "время 2 минут 3 секунд", "время 12 секунд"]:
+        for expected in ["время 3 часа 25 минут 45 секунд", "время 2 минуты 3 секунды", "время 12 секунд"]:
             answer.exec(UserMessage(42, "", ""))
             self.wapi_mock.send_message.assert_called_with(expected)
 
@@ -137,7 +137,7 @@ class TestAnswer(TestCase):
         self.random_mock.random.assert_called_once_with()
         self.wapi_mock.send_message.assert_called_once_with("рандомное число -100")
 
-    def test_funcions(self):
+    def test_functions(self):
         self.wapi_mock.get_stream_time.return_value = 12345
         self.wapi_mock.get_users_list.return_value = []
 

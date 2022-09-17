@@ -53,8 +53,35 @@ class Answer:
         s = t - h * 3600 - m * 60
 
         if h > 0:
-            return f"{h} часов {m} минут {s} секунд"
+            return f"{h} {Answer._format_hour(h)} {m} {Answer._format_minute(m)} {s} {Answer._format_second(s)}"
         elif m > 0:
-            return f"{m} минут {s} секунд"
+            return f"{m} {Answer._format_minute(m)} {s} {Answer._format_second(s)}"
         else:
-            return f"{s} секунд"
+            return f"{s} {Answer._format_second(s)}"
+
+    @staticmethod
+    def _format_hour(h: int) -> str:
+        if h == 1:
+            return "час"
+        elif h == 2 or h == 3 or h == 4:
+            return "часа"
+        else:
+            return "часов"
+
+    @staticmethod
+    def _format_minute(m: int) -> str:
+        if m == 1:
+            return "минута"
+        elif m == 2 or m == 3 or m == 4:
+            return "минуты"
+        else:
+            return "минут"
+
+    @staticmethod
+    def _format_second(s: int) -> str:
+        if s == 1:
+            return "секунда"
+        elif s == 2 or s == 3 or s == 4:
+            return "секунды"
+        else:
+            return "секунд"
