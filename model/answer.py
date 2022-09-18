@@ -11,9 +11,10 @@ from model.util.irandom import IRandom
 
 
 class Answer:
-    def __init__(self, template: Optional[str], ban: bool):
+    def __init__(self, template: Optional[str], sticker_name: Optional[str], ban: bool):
         self._template = AnswerSubstitutionTemplate(template) if template else None
         self._ban = ban
+        self._sticker_name = sticker_name
 
         self._rand = inject.instance(IRandom)
 
@@ -23,6 +24,9 @@ class Answer:
 
         if self._template:
             self._wapi.send_message(self._prepare_message(message))
+
+        if self._sticker_name and self._sticker_name != "":
+            self._wapi.send_sticker(self._sticker_name)
 
     def _prepare_message(self, message: UserMessage) -> str:
         users_total = self._wapi.get_users_count_total()

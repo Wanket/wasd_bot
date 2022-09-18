@@ -213,6 +213,21 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addWidget(self.ban_check_box)
 
+        self.horizontalLayout_7 = QHBoxLayout()
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.label_7 = QLabel(self.layoutWidget2)
+        self.label_7.setObjectName(u"label_7")
+
+        self.horizontalLayout_7.addWidget(self.label_7)
+
+        self.sticker_line_edit = QLineEdit(self.layoutWidget2)
+        self.sticker_line_edit.setObjectName(u"sticker_line_edit")
+
+        self.horizontalLayout_7.addWidget(self.sticker_line_edit)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_7)
+
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalSpacer = QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
@@ -288,6 +303,8 @@ class Ui_MainWindow(object):
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u0422\u0435\u043a\u0441\u0442 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u0412\u0435\u0440\u043e\u044f\u0442\u043d\u043e\u0441\u0442\u043d\u043e\u0435 \u0441\u043e\u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u0435", None))
         self.ban_check_box.setText(QCoreApplication.translate("MainWindow", u"\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0432 \u0431\u0430\u043d", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"\u0418\u043c\u044f \u0441\u0442\u0438\u043a\u0435\u0440\u0430", None))
+        self.sticker_line_edit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u041a\u0430\u043d\u0430\u043b-\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.start_tab), QCoreApplication.translate("MainWindow", u"\u0411\u043e\u0442", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:12pt;\">\u0413\u0434\u0435 \u0432\u0437\u044f\u0442\u044c \u0442\u043e\u043a\u0435\u043d?</span></p><p>\u041f\u0435\u0440\u0435\u0439\u0442\u0438 \u043f\u043e <a href=\"https://wasd.tv/general-settings/API\"><span style=\" text-decoration: underline; color:#007af4;\">\u0441\u0441\u044b\u043b\u043a\u0435</span></a>, \u043d\u0430\u0436\u0430\u0442\u044c &quot;\u0421\u0433\u0435\u043d\u0435\u043d\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439 \u0442\u043e\u043a\u0435\u043d&quot;, \u0437\u0430\u0442\u0435\u043c \u043a\u043d\u043e\u043f\u043a\u0443 \u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f \u0442\u043e\u043a\u0435\u043d\u0430.</p><p><span style=\" font-size:12pt;\">\u041a\u0430\u043a\u0438\u0435 \u043f\u043b\u0435\u0439\u0441\u0445\u043e\u043b\u0434\u0435\u043d\u044b \u043f\u043e\u0434\u0434\u0435\u0436\u0438\u0432\u0430\u044e\u0442\u0441\u044f \u0432 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f\u0445?</span>"
                         "<br/><span style=\" color:#808000;\">${uptime}</span> \u2014 \u0441\u0443\u043c\u043c\u0430\u0440\u043d\u043e\u0435 \u0432\u0440\u0435\u043c \u0441\u0442\u0440\u0438\u043c\u0430;</p><p><span style=\" color:#808000;\">${game_name}</span> \u2014 \u0438\u043c\u044f \u0442\u0435\u043a\u0443\u0449\u0435\u0439 \u0438\u0433\u0440\u044b;</p><p><span style=\" color:#808000;\">${user_name}</span> \u2014 \u0438\u043c\u044f \u043d\u0430\u043f\u0438\u0441\u0430\u0432\u0448\u0435\u0433\u043e \u043a\u043e\u043c\u0430\u043d\u0434\u0443 \u0431\u043e\u0442\u0430;</p><p><span style=\" color:#808000;\">${users_count_total}</span> \u2014 \u0440\u0435\u0430\u043b\u044c\u043d\u043e\u0435 \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439;</p><p><span style=\" color:#808000;\">${users_count_auth}</span> \u2014 \u0440\u0435\u0430\u043b\u044c\u043d\u043e\u0435 \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0430\u0432\u0442\u043e\u0440"

@@ -7,6 +7,7 @@ import inject
 
 from model.settings.answer_settings import AnswerSettings
 from model.settings.bot_settings import BotSettings
+from model.settings.command_settings import CommandSettings
 from repository.repository import Repository
 from util.iapp_folders import IAppFolders
 
@@ -27,7 +28,7 @@ class TestDataBase(unittest.TestCase):
         self.assertEqual(repo.get_bot_settings(), BotSettings("", "", {}))
 
         settings = BotSettings(token="test_token", commands={
-            "test_command": {"test_answer": AnswerSettings(1, "message_template", False)}
+            "test_command": CommandSettings(42, {"test_answer": AnswerSettings(1, "message_template", None, False)})
         }, channel="test_channel")
 
         repo.set_bot_settings(settings)

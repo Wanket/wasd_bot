@@ -24,7 +24,7 @@ class TestAnswer(TestCase):
         self.wapi_mock.get_stream_time.return_value = 12345
         self.wapi_mock.get_game_name.return_value = "test game"
 
-        answer = Answer("время ${uptime}, игра ${game_name}, написал пользователь ${user_name}", False)
+        answer = Answer("время ${uptime}, игра ${game_name}, написал пользователь ${user_name}", None, False)
         answer.exec(UserMessage(42, "test_user", "test_message"))
 
         self.wapi_mock.get_stream_time.assert_called_once_with()
@@ -33,7 +33,7 @@ class TestAnswer(TestCase):
     def test_smart_placeholder(self):
         self.wapi_mock.get_stream_time.return_value = 12345
 
-        answer = Answer("${user_name}name}", False)
+        answer = Answer("${user_name}name}", None, False)
         answer.exec(UserMessage(42, "${user_", ""))
 
         self.wapi_mock.send_message.assert_called_once_with("${user_name}")
@@ -41,7 +41,7 @@ class TestAnswer(TestCase):
     def test_ban(self):
         self.wapi_mock.get_stream_time.return_value = 12345
 
-        answer = Answer("", True)
+        answer = Answer("", None, True)
         answer.exec(UserMessage(42, "", ""))
 
         self.wapi_mock.ban_user.assert_called_once_with(42)
@@ -49,7 +49,7 @@ class TestAnswer(TestCase):
     def test_no_message_no_ban(self):
         self.wapi_mock.get_stream_time.return_value = 12345
 
-        answer = Answer(None, False)
+        answer = Answer(None, None, False)
         answer.exec(UserMessage(42, "", ""))
 
         self.wapi_mock.send_message.assert_not_called()
@@ -58,7 +58,7 @@ class TestAnswer(TestCase):
     def test_time(self):
         self.wapi_mock.get_stream_time.side_effect = [12345, 123, 12]
 
-        answer = Answer("время ${uptime}", False)
+        answer = Answer("время ${uptime}", None, False)
 
         for expected in ["время 3 часа 25 минут 45 секунд", "время 2 минуты 3 секунды", "время 12 секунд"]:
             answer.exec(UserMessage(42, "", ""))
@@ -70,7 +70,7 @@ class TestAnswer(TestCase):
 
         self.random_mock.choice.return_value = "user2"
 
-        answer = Answer("рандомный пользователь ${random_user}", False)
+        answer = Answer("рандомный пользователь ${random_user}", None, False)
         answer.exec(UserMessage(42, "", ""))
 
         self.wapi_mock.get_users_list.assert_called_once_with()
@@ -81,7 +81,7 @@ class TestAnswer(TestCase):
         self.wapi_mock.get_stream_time.return_value = 12345
         self.wapi_mock.get_users_list.return_value = []
 
-        answer = Answer("рандомный пользователь ${random_user}", False)
+        answer = Answer("рандомный пользователь ${random_user}", None, False)
         answer.exec(UserMessage(42, "", ""))
 
         self.wapi_mock.get_users_list.assert_called_once_with()
@@ -93,7 +93,7 @@ class TestAnswer(TestCase):
 
         self.random_mock.random.return_value = 0.45
 
-        answer = Answer("рандомное число ${random_number(1, 100)}", False)
+        answer = Answer("рандомное число ${random_number(1, 100)}", None, False)
         answer.exec(UserMessage(0, "", ""))
 
         self.random_mock.random.assert_called_once_with()
@@ -104,10 +104,10 @@ class TestAnswer(TestCase):
 
         self.random_mock.random.return_value = 0.45
 
-        answer = Answer("рандомное число ${random_number(100,1)}", False)
+        answer = Answer("рандомное число ${random_number(100,1)}", None, False)
         answer.exec(UserMessage(0, "", ""))
 
-        answer = Answer("рандомное число ${random_number(100, 100)}", False)
+        answer = Answer("рандомное число ${random_number(100, 100)}", None, False)
         answer.exec(UserMessage(0, "", ""))
 
         self.wapi_mock.send_message.assert_has_calls([
@@ -120,7 +120,7 @@ class TestAnswer(TestCase):
 
         self.random_mock.random.return_value = 0.45
 
-        answer = Answer("рандомное число ${random_number(1.100, 2)", False)
+        answer = Answer("рандомное число ${random_number(1.100, 2)", None, False)
         answer.exec(UserMessage(0, "", ""))
 
         self.random_mock.random.assert_called_once_with()
@@ -131,7 +131,7 @@ class TestAnswer(TestCase):
 
         self.random_mock.random.return_value = 0.45
 
-        answer = Answer("рандомное число ${random_number(-100, -100)}", False)
+        answer = Answer("рандомное число ${random_number(-100, -100)}", None, False)
         answer.exec(UserMessage(0, "", ""))
 
         self.random_mock.random.assert_called_once_with()
@@ -141,9 +141,19 @@ class TestAnswer(TestCase):
         self.wapi_mock.get_stream_time.return_value = 12345
         self.wapi_mock.get_users_list.return_value = []
 
-        answer = Answer("рандомный пользователь ${random_user()}", False)
+        answer = Answer("рандомный пользователь ${random_user()}", None, False)
         answer.exec(UserMessage(42, "", ""))
 
         self.wapi_mock.get_users_list.assert_called_once_with()
-        self.random_mock.choice.assert_not_called()
         self.wapi_mock.send_message.assert_called_once_with("рандомный пользователь ${random_user()}")
+
+    def test_stickers(self):
+        self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = []
+
+        answer = Answer("", "Test_Sticker", False)
+        answer.exec(UserMessage(0, "", ""))
+
+        self.wapi_mock.send_message.assert_not_called()
+
+        self.wapi_mock.send_sticker.assert_called_once_with("Test_Sticker")

@@ -31,8 +31,8 @@ class TestCommand(TestCase):
 
         self.date_time_mock.return_value = datetime(2020, 1, 1)
 
-        first_answer = Answer("first_answer", False)
-        second_answer = Answer("second_answer", False)
+        first_answer = Answer("first_answer", None, False)
+        second_answer = Answer("second_answer", None, False)
 
         command = Command([(2, first_answer), (1, second_answer)], 0)
 
@@ -49,7 +49,7 @@ class TestCommand(TestCase):
 
         self.date_time_mock.now.side_effect = [datetime(2020, 1, 1), datetime(2020, 1, 1, 0, 0, 2), datetime(2020, 1, 1, 0, 0, 5)]
 
-        command = Command([(1, Answer("test", False))], 4)
+        command = Command([(1, Answer("test", None, False))], 4)
 
         command.exec(UserMessage(42, "", ""))
         self.wapi_mock.send_message.assert_called_with("test")

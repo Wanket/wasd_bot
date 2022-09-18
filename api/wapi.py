@@ -4,7 +4,7 @@ from asyncio import CancelledError, Future
 from concurrent import futures
 from datetime import datetime
 from threading import Thread
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import inject
 import socketio
@@ -53,23 +53,33 @@ class Wapi(IWapi):
 
         self._users_list: List[str] = []
 
+        self._stickers_map: Dict[str, int] = {}
+
     def send_message(self, text: str):
-        async def test():
-            await self._socket.emit("message", {
+        asyncio.run_coroutine_threadsafe(
+            self._socket.emit("message", {
                 "channelId": self._channel_id,
                 "hash": hash_message(),
                 "jwt": self._jwt,
                 "message": text,
                 "streamId": self._stream_id,
                 "streamerId": self._streamer_id,
-            })
-
-        asyncio.run_coroutine_threadsafe(
-            test(), self._event_loop
+            }), self._event_loop
         )
 
     def ban_user(self, user_id: int):
         asyncio.run_coroutine_threadsafe(self._ban_user_impl(user_id), self._event_loop)
+
+    def send_sticker(self, sticker_name: str):
+        asyncio.run_coroutine_threadsafe(
+            self._socket.emit("sticker", {
+                "channel_id": self._channel_id,
+                "hash": hash_message(),
+                "sticker_id": self._stickers_map[sticker_name] if sticker_name in self._stickers_map else 0,
+                "stream_id": self._stream_id,
+                "streamer_id": self._streamer_id,
+            }), self._event_loop
+        )
 
     def get_stream_time(self) -> int:
         return int((datetime.utcnow() - self._stream_started_date.replace(tzinfo=None)).total_seconds())
@@ -181,6 +191,8 @@ class Wapi(IWapi):
 
     async def _load_stream_data(self, load_jwt: bool, retrying_postfix: str) -> bool:
         try:
+            self._channel_is_live = True
+
             if load_jwt:
                 async with self._http_client.post(f"https://wasd.tv/api/auth/chat-token",
                                                   headers={"Authorization": f"Token {self._token}"}) as response:
@@ -227,6 +239,19 @@ class Wapi(IWapi):
 
                 users = [user["user_login"] for user in (await response.json())["result"]]
 
+            async with self._http_client.get(f"https://wasd.tv/api/chat/streamers/{stream_id}/stickerpack?limit=100&offset=0",
+                                             headers={"Authorization": f"Token {self._token}"}) as response:
+                if response.status != 200:
+                    self._logger.error(
+                        f"{self.__class__.__name__}: failed to load stream stickerpack,"
+                        f" status: {response.status}, data: {await response.text()}, retrying in {retrying_postfix}"
+                    )
+
+                    return False
+
+                sticker_packs = [sticker_pack["stickers"] for sticker_pack in (await response.json())["result"]]
+                stickers = {sticker["sticker_alias"]: sticker["sticker_id"] for sticker_pack in sticker_packs for sticker in sticker_pack}
+
             self._channel_id = channel_id
             self._stream_id = stream_id
             self._streamer_id = streamer_id
@@ -234,6 +259,8 @@ class Wapi(IWapi):
             self._stream_started_date = stream_started_date
 
             self._users_list = users
+
+            self._stickers_map = stickers
 
             return True
         except (CancelledError, futures.CancelledError):

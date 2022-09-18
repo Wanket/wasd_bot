@@ -6,4 +6,5 @@ from typing import Optional
 class AnswerSettings:
     rate: int
     template: Optional[str]
+    sticker_name: Optional[str]
     ban: bool

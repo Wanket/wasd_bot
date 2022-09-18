@@ -12,6 +12,10 @@ class IWapi(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def send_sticker(self, sticker_name: str):
+        pass
+
+    @abstractmethod
     def get_stream_time(self) -> int:
         pass
 

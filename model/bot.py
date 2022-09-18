@@ -77,7 +77,7 @@ class Bot:
         for name, command in bot_settings.commands.items():
             answers = []
             for _, answer_settings in command.answers.items():
-                answers.append((answer_settings.rate, Answer(answer_settings.template, answer_settings.ban)))
+                answers.append((answer_settings.rate, Answer(answer_settings.template, answer_settings.sticker_name, answer_settings.ban)))
 
             commands[name.lower()] = Command(answers, command.timeout)
 

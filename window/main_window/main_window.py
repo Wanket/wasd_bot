@@ -72,6 +72,7 @@ class MainWindow(QMainWindow):
         self._ui.answer_text_edit.textChanged.connect(self._answer_text_changed)
         self._ui.ban_check_box.stateChanged.connect(self._ban_check_box_changed)
         self._ui.rate_spin_box.valueChanged.connect(self._rate_spin_box_changed)
+        self._ui.sticker_line_edit.textChanged.connect(self._sticker_line_edit_changed)
 
         self._ui.apply_button_box.clicked.connect(self._apply_button_clicked)
 
@@ -83,7 +84,7 @@ class MainWindow(QMainWindow):
         self._ui.timeout_spin_box.valueChanged.connect(self._timeout_spin_box_changed)
 
     def _on_logs(self, message: str):
-        self._ui.log_text_edit.append(message)
+        self._ui.log_text_edit.insertPlainText(f"{message}\n")
 
     def _add_command_clicked(self):
         command_name = _find_unique_name("Новая команда", self._settings.commands)
@@ -97,7 +98,7 @@ class MainWindow(QMainWindow):
     def _add_answer_clicked(self):
         answer_name = _find_unique_name("Новый ответ", self._settings.commands[self._activated_command].answers)
 
-        self._settings.commands[self._activated_command].answers[answer_name] = AnswerSettings(1, "", False)
+        self._settings.commands[self._activated_command].answers[answer_name] = AnswerSettings(1, "", None, False)
 
         self._add_answer(answer_name)
 
@@ -202,23 +203,27 @@ class MainWindow(QMainWindow):
         if is_enabled and current_command in self._settings.commands and current_answer in self._settings.commands[current_command].answers:
             answer_settings = self._settings.commands[current_command].answers[current_answer]
         else:
-            answer_settings = AnswerSettings(1, "", False)
+            answer_settings = AnswerSettings(1, "", None, False)
 
         self._ui.answer_text_edit.setEnabled(is_enabled)
         self._ui.ban_check_box.setEnabled(is_enabled)
         self._ui.rate_spin_box.setEnabled(is_enabled)
+        self._ui.sticker_line_edit.setEnabled(is_enabled)
 
         self._ui.answer_text_edit.blockSignals(True)
         self._ui.ban_check_box.blockSignals(True)
         self._ui.rate_spin_box.blockSignals(True)
+        self._ui.sticker_line_edit.blockSignals(True)
 
         self._ui.answer_text_edit.setPlainText(answer_settings.template)
         self._ui.ban_check_box.setChecked(answer_settings.ban)
         self._ui.rate_spin_box.setValue(answer_settings.rate)
+        self._ui.sticker_line_edit.setText(answer_settings.sticker_name if answer_settings.sticker_name else "")
 
         self._ui.answer_text_edit.blockSignals(False)
         self._ui.ban_check_box.blockSignals(False)
         self._ui.rate_spin_box.blockSignals(False)
+        self._ui.sticker_line_edit.blockSignals(False)
 
     def _command_item_selected(self):
         item = self._ui.commands_list_widget.selectedItems()
@@ -274,6 +279,12 @@ class MainWindow(QMainWindow):
 
             self._ui.apply_button_box.setEnabled(True)
 
+    def _sticker_line_edit_changed(self):
+        if self._ui.sticker_line_edit.isEnabled():
+            self._get_current_answer_settings().sticker_name = self._ui.sticker_line_edit.text()
+
+            self._ui.apply_button_box.setEnabled(True)
+
     def _timeout_spin_box_changed(self, value: int):
         if self._ui.timeout_spin_box.isEnabled():
             self._get_current_command_settings().timeout = value
@@ -295,7 +306,7 @@ class MainWindow(QMainWindow):
         if command_name in self._settings.commands and answer_name in self._settings.commands[command_name].answers:
             return self._settings.commands[command_name].answers[answer_name]
 
-        return AnswerSettings(1, "", False)
+        return AnswerSettings(1, "", None, False)
 
     def _get_current_command_settings(self) -> CommandSettings:
         command_name_items = self._ui.commands_list_widget.selectedItems()
