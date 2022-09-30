@@ -271,7 +271,7 @@ class Wapi(IWapi):
             return False
 
     async def _socket_loop(self):
-        await self._socket.connect("wss://chat.wasd.tv")
+        await self._socket.connect("wss://chat.wasd.tv", transports="websocket")
 
         await self._socket.wait()
 
@@ -285,10 +285,6 @@ class Wapi(IWapi):
 
         @socket.event
         async def connect():
-            self._logger.info(f"{self.__class__.__name__}: connected, wait because wasd is stupid")
-
-            await self._socket.sleep(5)
-
             self._logger.info(f"{self.__class__.__name__}: wait finished, try to join")
 
             await self._socket.emit("join", {

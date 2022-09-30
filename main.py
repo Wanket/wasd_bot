@@ -1,3 +1,5 @@
+from sys import exit
+
 import inject
 
 from app.app import App
