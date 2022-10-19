@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import inject
 from lazy import lazy
@@ -67,27 +67,22 @@ class Answer:
 
     @staticmethod
     def _format_hour(h: int) -> str:
-        if h == 1:
-            return "час"
-        elif h == 2 or h == 3 or h == 4:
-            return "часа"
-        else:
-            return "часов"
+        return Answer._format_number(h, ("час", "часа", "часов"))
 
     @staticmethod
     def _format_minute(m: int) -> str:
-        if m == 1:
-            return "минута"
-        elif m == 2 or m == 3 or m == 4:
-            return "минуты"
-        else:
-            return "минут"
+        return Answer._format_number(m, ("минута", "минуты", "минут"))
 
     @staticmethod
     def _format_second(s: int) -> str:
-        if s == 1:
-            return "секунда"
-        elif s == 2 or s == 3 or s == 4:
-            return "секунды"
-        else:
-            return "секунд"
+        return Answer._format_number(s, ("секунда", "секунды", "секунд"))
+
+    @staticmethod
+    def _format_number(n: int, variants: Tuple[str, str, str]) -> str:
+        if n % 10 == 1 and n != 11:
+            return variants[0]
+
+        if (n % 10 == 2 or n % 10 == 3 or n % 10 == 4) and n != 12 and n != 13 and n != 14:
+            return variants[1]
+
+        return variants[2]
