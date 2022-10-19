@@ -11,7 +11,17 @@ class MessageHighlighter(BaseHighlighter):
         command_format = QTextCharFormat()
         command_format.setForeground(Qt.darkYellow)
 
-        commands_generic = ["uptime", "game_name", "user_name", "users_count_total", "users_count_auth", "users_count_anon", "random_user"]
+        commands_generic = [
+            "uptime",
+            "game_name",
+            "user_name",
+            "users_count_total",
+            "users_count_auth",
+            "users_count_anon",
+            "random_user",
+            "users_tagged"
+        ]
+
         commands_functions = ["random_number"]
 
         command_regex = QRegularExpression(rf"\${{({'|'.join(commands_generic)})}}")

@@ -44,6 +44,8 @@ class Answer:
             users_count_anon=users_anon if users_anon is not None else "(нет данных)",
             random_user=self._rand.choice(users_list) if users_list else "(чат пуст)",
             random_number=self._rand.random(),
+            users_list=users_list,
+            args=message.text,
         ))
 
     @lazy
