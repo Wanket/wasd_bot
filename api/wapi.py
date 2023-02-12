@@ -12,7 +12,9 @@ from aiohttp import ClientSession
 from dateutil.parser import isoparse
 
 from api.iwapi import IWapi
+from api.metrics import WapiMetrics
 from api.utils import hash_message
+from metrics.imetrics import IMetrics
 from model.bot import Bot
 from model.user_message import UserMessage
 from util.ilogger import ILogger
@@ -22,6 +24,7 @@ class Wapi(IWapi):
     def __init__(self):
         self._logger = inject.instance(ILogger)
         self._bot = inject.instance(Bot)
+        self._metrics = inject.instance(IMetrics)
 
         self._event_loop = asyncio.new_event_loop()
         self._start_event_loop_thread()
@@ -56,30 +59,24 @@ class Wapi(IWapi):
         self._stickers_map: Dict[str, int] = {}
 
     def send_message(self, text: str):
-        asyncio.run_coroutine_threadsafe(
-            self._socket.emit("message", {
-                "channelId": self._channel_id,
-                "hash": hash_message(),
-                "jwt": self._jwt,
-                "message": text,
-                "streamId": self._stream_id,
-                "streamerId": self._streamer_id,
-            }), self._event_loop
-        )
+        asyncio.run_coroutine_threadsafe(self._send_message_impl(text), self._event_loop)
 
     def ban_user(self, user_id: int):
         asyncio.run_coroutine_threadsafe(self._ban_user_impl(user_id), self._event_loop)
 
     def send_sticker(self, sticker_name: str):
-        asyncio.run_coroutine_threadsafe(
-            self._socket.emit("sticker", {
-                "channel_id": self._channel_id,
-                "hash": hash_message(),
-                "sticker_id": self._stickers_map[sticker_name] if sticker_name in self._stickers_map else 0,
-                "stream_id": self._stream_id,
-                "streamer_id": self._streamer_id,
-            }), self._event_loop
-        )
+        asyncio.run_coroutine_threadsafe(self._send_sticker_impl(sticker_name), self._event_loop)
+
+    async def _send_sticker_impl(self, sticker_name: str):
+        await self._socket.emit("sticker", {
+            "channel_id": self._channel_id,
+            "hash": hash_message(),
+            "sticker_id": self._stickers_map[sticker_name] if sticker_name in self._stickers_map else 0,
+            "stream_id": self._stream_id,
+            "streamer_id": self._streamer_id,
+        })
+
+        self._metrics.inc_metric(WapiMetrics.SEND_STICKER_COUNT.value, str(self._channel_id), sticker_name)
 
     def get_stream_time(self) -> int:
         return int((datetime.utcnow() - self._stream_started_date.replace(tzinfo=None)).total_seconds())
@@ -102,6 +99,8 @@ class Wapi(IWapi):
             self._logger.info(f"{self.__class__.__name__}: stop listen")
         except Exception as e:
             self._logger.exception(f"{self.__class__.__name__}: got error while stopping listen: {e}")
+
+            self._metrics.inc_metric(WapiMetrics.ERRORS_COUNT.value, "stop_listen")
         finally:
             if self._socket.connected:
                 asyncio.run_coroutine_threadsafe(self._socket.disconnect(), self._event_loop).result()
@@ -144,6 +143,8 @@ class Wapi(IWapi):
             except Exception as e:
                 self._logger.exception(f"{self.__class__.__name__}: got error in socket loop, error: {e}, reconnecting in 1 second")
 
+                self._metrics.inc_metric(WapiMetrics.ERRORS_COUNT.value, "start_listen_impl")
+
                 await asyncio.sleep(1)
             finally:
                 if self._socket.connected:
@@ -160,6 +161,19 @@ class Wapi(IWapi):
 
         self._logger.info(f"{self.__class__.__name__}: stream data loaded")
 
+    async def _send_message_impl(self, text: str):
+        await self._socket.emit("message", {
+            "channelId": self._channel_id,
+            "hash": hash_message(),
+            "jwt": self._jwt,
+            "message": text,
+            "streamId": self._stream_id,
+            "streamerId": self._streamer_id,
+        })
+
+        self._metrics.inc_metric(WapiMetrics.SEND_MESSAGE_COUNT.value, str(self._channel_id))
+        self._metrics.add_metric(WapiMetrics.SEND_MESSAGE_LENGTH.value, len(text), str(self._channel_id))
+
     async def _ban_user_impl(self, user_id: int):
         async with self._http_client.put(
                 f"https://wasd.tv/api/channels/{self._channel_id}/banned-users",
@@ -172,6 +186,10 @@ class Wapi(IWapi):
                 }) as response:
             if response.status != 200 and response.status != 403:
                 self._logger.error(f"{self.__class__.__name__}: failed to ban user, status: {response.status}")
+
+                self._metrics.inc_metric(WapiMetrics.BAN_USER_COUNT.value, str(self._channel_id), str("FAILED"))
+            else:
+                self._metrics.inc_metric(WapiMetrics.BAN_USER_COUNT.value, str(self._channel_id), str("SUCCESS"))
 
     async def _load_stream_data_loop(self):
         while True:
@@ -268,6 +286,8 @@ class Wapi(IWapi):
         except Exception as e:
             self._logger.exception(f"{self.__class__.__name__}: got error while loading stream data, error: {e}, retrying in {retrying_postfix}")
 
+            self._metrics.inc_metric(WapiMetrics.ERRORS_COUNT.value, "load_stream_data")
+
             return False
 
     async def _socket_loop(self):
@@ -294,30 +314,44 @@ class Wapi(IWapi):
                 "excludeStickers": True,
             })
 
+            self._metrics.inc_metric(WapiMetrics.EVENT_COUNT.value, "chat_connect")
+
         @socket.event
         async def disconnect():
             self._logger.info(f"{self.__class__.__name__}: disconnected")
+
+            self._metrics.inc_metric(WapiMetrics.EVENT_COUNT.value, "chat_disconnect")
 
         @socket.event
         async def connect_error(data):
             self._logger.error(f"{self.__class__.__name__}: connect error, data: {data}")
 
+            self._metrics.inc_metric(WapiMetrics.EVENT_COUNT.value, "chat_connect_error")
+
         @socket.event
         async def joined(data):
             self._logger.info(f"{self.__class__.__name__}: joined to chat, data: {data}")
+
+            self._metrics.inc_metric(WapiMetrics.EVENT_COUNT.value, "chat_joined")
 
         @socket.event
         async def message(data):
             self._bot.on_message(UserMessage(user_id=int(data["user_id"]), user_name=data["user_login"], text=data["message"]))
 
+            self._metrics.inc_metric(WapiMetrics.EVENT_COUNT.value, "chat_message")
+
         @socket.event
         async def highlighted_message(data):
             self._bot.on_message(UserMessage(user_id=int(data["user_id"]), user_name=data["user_login"], text=data["message"]))
+
+            self._metrics.inc_metric(WapiMetrics.EVENT_COUNT.value, "chat_highlighted_message")
 
         @socket.event
         async def viewers(data):
             self._users_anon = data["anon"]
             self._users_auth = data["auth"]
             self._users_total = data["total"]
+
+            self._metrics.set_metric(WapiMetrics.EVENT_COUNT.value, "chat_viewers")
 
         return socket

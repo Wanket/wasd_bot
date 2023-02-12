@@ -27,6 +27,7 @@ class TestCommand(TestCase):
 
     def test_rate(self):
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
         self.date_time_mock.now.return_value = datetime(2020, 1, 1)
 
         self.date_time_mock.return_value = datetime(2020, 1, 1)
@@ -45,6 +46,7 @@ class TestCommand(TestCase):
 
     def test_timeout(self):
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
         self.random_mock.randint.return_value = 1
 
         self.date_time_mock.now.side_effect = [datetime(2020, 1, 1), datetime(2020, 1, 1, 0, 0, 2), datetime(2020, 1, 1, 0, 0, 5)]

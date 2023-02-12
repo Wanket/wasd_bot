@@ -6,6 +6,7 @@ from model.settings.bot_settings import BotSettings
 # noinspection PyUnresolvedReferences
 from repository.irepository import IRepository
 from util.iapp_folders import IAppFolders
+from util.ilogger import ILogger
 
 
 class Repository(IRepository):
@@ -14,7 +15,13 @@ class Repository(IRepository):
     def __init__(self):
         folders = inject.instance(IAppFolders)
 
-        self._db = UnQLite(f"{folders.get_settings_folder()}/bot.db")
+        settings_folder = f"{folders.get_settings_folder()}/bot.db"
+
+        self._db = UnQLite(settings_folder)
+
+        logger = inject.instance(ILogger)
+
+        logger.info(f"{self.__class__.__name__}: db folder: {settings_folder}")
 
     def get_bot_settings(self) -> BotSettings:
         if self._bot_settings_key not in self._db:

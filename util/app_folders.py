@@ -1,9 +1,11 @@
 import os
 
+import inject
 from appdirs import user_log_dir, user_config_dir
 
 from util.app_info import app_name
 from util.iapp_folders import IAppFolders
+from util.ilogger import ILogger
 
 
 class AppFolders(IAppFolders):

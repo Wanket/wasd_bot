@@ -6,6 +6,8 @@ from PySide6.QtWidgets import QApplication
 
 from api.iwapi import IWapi
 from api.wapi import Wapi
+from metrics.imetrics import IMetrics
+from metrics.metrics import Metrics
 from model.util.datetime_impl import DateTime
 from model.util.idatetime import IDateTime
 from model.util.irandom import IRandom
@@ -54,4 +56,5 @@ class App:
             .bind_to_constructor(IRepository, Repository)
             .bind_to_constructor(ILogger, Logger)
             .bind_to_constructor(IDateTime, DateTime)
+            .bind_to_constructor(IMetrics, Metrics)
         )

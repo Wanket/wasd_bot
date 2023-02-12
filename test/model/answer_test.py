@@ -23,6 +23,7 @@ class TestAnswer(TestCase):
     def test_placeholder(self):
         self.wapi_mock.get_stream_time.return_value = 12345
         self.wapi_mock.get_game_name.return_value = "test game"
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
 
         answer = Answer("время ${uptime}, игра ${game_name}, написал пользователь ${user_name}", None, False)
         answer.exec(UserMessage(42, "test_user", "test_message"))
@@ -32,6 +33,7 @@ class TestAnswer(TestCase):
 
     def test_smart_placeholder(self):
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
 
         answer = Answer("${user_name}name}", None, False)
         answer.exec(UserMessage(42, "${user_", ""))
@@ -57,6 +59,7 @@ class TestAnswer(TestCase):
 
     def test_time(self):
         self.wapi_mock.get_stream_time.side_effect = [12345, 123, 12]
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
 
         answer = Answer("время ${uptime}", None, False)
 
@@ -90,6 +93,7 @@ class TestAnswer(TestCase):
 
     def test_random_number(self):
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
 
         self.random_mock.random.return_value = 0.45
 
@@ -101,6 +105,7 @@ class TestAnswer(TestCase):
 
     def test_random_number_wrong_from_to(self):
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
 
         self.random_mock.random.return_value = 0.45
 
@@ -117,6 +122,7 @@ class TestAnswer(TestCase):
 
     def test_random_number_float(self):
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
 
         self.random_mock.random.return_value = 0.45
 
@@ -128,6 +134,7 @@ class TestAnswer(TestCase):
 
     def test_random_number_negative(self):
         self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["test_user"]
 
         self.random_mock.random.return_value = 0.45
 

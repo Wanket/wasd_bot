@@ -16,7 +16,9 @@ class Logger(ILogger):
 
         folders = inject.instance(IAppFolders)
 
-        file_handler = RotatingFileHandler(f"{folders.get_logs_folder()}/bot.log", maxBytes=1048576, backupCount=3)
+        logs_folder = f"{folders.get_logs_folder()}/bot.log"
+
+        file_handler = RotatingFileHandler(logs_folder, maxBytes=1048576, backupCount=3)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(logging.Formatter(self._log_format))
 

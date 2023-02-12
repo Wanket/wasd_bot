@@ -4,6 +4,7 @@ jsonpickle
 appdirs
 pyside6
 python-socketio[asyncio_client]==4.*
+python-engineio[asyncio_client]==3.*
 aiohttp[speedups]
 python-dateutil
 lazy
