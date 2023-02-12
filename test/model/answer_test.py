@@ -58,12 +58,12 @@ class TestAnswer(TestCase):
         self.wapi_mock.ban_user.assert_not_called()
 
     def test_time(self):
-        self.wapi_mock.get_stream_time.side_effect = [12345, 123, 12]
+        self.wapi_mock.get_stream_time.side_effect = [12341, 123, 12]
         self.wapi_mock.get_users_list.return_value = ["test_user"]
 
         answer = Answer("время ${uptime}", None, False)
 
-        for expected in ["время 3 часа 25 минут 45 секунд", "время 2 минуты 3 секунды", "время 12 секунд"]:
+        for expected in ["время 3 часа 25 минут 41 секунда", "время 2 минуты 3 секунды", "время 12 секунд"]:
             answer.exec(UserMessage(42, "", ""))
             self.wapi_mock.send_message.assert_called_with(expected)
 
@@ -164,3 +164,33 @@ class TestAnswer(TestCase):
         self.wapi_mock.send_message.assert_not_called()
 
         self.wapi_mock.send_sticker.assert_called_once_with("Test_Sticker")
+
+    def test_users_tagged(self):
+        self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["user1", "uSer2", "user3"]
+
+        answer = Answer("Test ${users_tagged}", None, False)
+        answer.exec(UserMessage(0, "", "@uSer1 @user2 @user4"))
+
+        self.wapi_mock.send_message.assert_called_once_with("Test @uSer1, @user2")
+
+    def test_users_tagged_one(self):
+        self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["user1", "uSer2", "user3"]
+
+        answer = Answer("Test ${users_tagged}", None, False)
+        answer.exec(UserMessage(0, "", "@user1"))
+
+        self.wapi_mock.send_message.assert_called_once_with("Test @user1")
+
+    def test_users_tagged_empty(self):
+        self.wapi_mock.get_stream_time.return_value = 12345
+        self.wapi_mock.get_users_list.return_value = ["user1", "uSer2", "user3"]
+
+        answer = Answer("Test ${users_tagged}", None, False)
+        answer.exec(UserMessage(0, "", ""))
+
+        answer = Answer("Test ${users_tagged}", None, False)
+        answer.exec(UserMessage(0, "", "@user4"))
+
+        self.wapi_mock.send_message.assert_has_calls((call("Test (не указан зритель)"), call("Test (не указан зритель)")))
